@@ -92,7 +92,15 @@ class LivreViewSet(viewsets.ModelViewSet):
 
         livre.delete()
         return Response({'message': 'livre deleted'})
+    """
+    def get_permissions(self):
+        if self.action == 'update' :
+            permission_classes = [IsCreateurOrReadOnly]
+        elif self.action == 'destroy':
+            permission_classes = [permissions.IsAdminUser]
     
+        return permission_classes
+    """
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
