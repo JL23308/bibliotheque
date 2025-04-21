@@ -21,7 +21,7 @@ class LivreViewSet(viewsets.ModelViewSet):
     filterset_class = LivreFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     pagination_class = LivrePagination
-    ordering_fields = ['titre', 'data_publication', 'auteur__nom']
+    ordering_fields = ['titre', 'date_publication', 'auteur__nom']
 
     def create(self, request, auteurs_pk=None, categories_pk=None):
         request.data.createur = request.user.id
@@ -93,13 +93,6 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.delete()
         return redirect("/livres")
     
-    def get_permissions(self):
-        if self.action == 'update':
-            permission_classes = [IsCreateurOrReadOnly]
-        else:
-            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-        return [permission() for permission in permission_classes]
-
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
