@@ -28,7 +28,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         serializer = LivreSerializer(data=request.data)
         if(serializer.is_valid()):
             if auteurs_pk:
-                auteur = Auteur.objects.get(pk=auteurs_pk)
+                auteur = get_object_or_404(Auteur, pk=auteurs_pk)
                 serializer.save(auteur=auteur, createur=request.user)
             elif categories_pk:
                 categorie = Categorie.objects.filter(pk=categories_pk)
