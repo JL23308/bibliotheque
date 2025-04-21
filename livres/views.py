@@ -66,6 +66,21 @@ class LivreViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response(serializer.errors)
     
+    def partial_update(self, request, pk, auteurs_pk=None, categories_pk=None):
+        livre = Livre.objects.get(pk=pk)
+        serializer = LivreSerializer(instance=livre, data=request.data)
+        if serializer.is_valid():
+            if auteurs_pk:
+                auteur = Auteur.objects.get(pk=auteurs_pk)
+                serializer.save(auteur=auteur)
+            elif categories_pk:
+                categories = Categorie.objects.filter(pk=categories_pk)
+                serializer.save(categorie=livre.categorie.all() | categories)
+            else:
+                serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
     def destroy(self, request, pk, categories_pk=None):
         livre = Livre.objects.get(pk=pk)
         if categories_pk:
@@ -77,6 +92,13 @@ class LivreViewSet(viewsets.ModelViewSet):
 
         livre.delete()
         return redirect("/livres")
+    
+    def get_permissions(self):
+        if self.action == 'update':
+            permission_classes = [IsCreateurOrReadOnly]
+        else:
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        return [permission() for permission in permission_classes]
 
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
@@ -92,7 +114,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
         serializer = CategorieSerializer(categories, many=True)
         return Response(serializer.data)
      
-    def create(self, request, pk, livres_pk=None):                
+    def create(self, request, livres_pk=None):                
         serializer = CategorieSerializer(data=request.data)
         if serializer.is_valid():    
             if livres_pk:
@@ -116,7 +138,6 @@ class CategorieViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors)
     
     def destroy(self, request,pk, livres_pk=None):
-        
         categorie = Categorie.objects.get(pk=pk)
         if livres_pk:
             serializer = CategorieSerializer(instance=categorie, data=request.data)

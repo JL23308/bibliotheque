@@ -12,10 +12,6 @@ def validate_isbn(value):
     if not value.isdigit():
         raise ValidationError(_("%(value)s is incorrect. It must contain numbers only"), params={"value": value})
         
-    existing_isbn = Livre.objects.filter(isbn=value)
-    if existing_isbn:
-        raise ValidationError(_("%(value)s already exists."), params={"value": value})
-
 # Create your models here.
 
 class Auteur(models.Model):
