@@ -46,7 +46,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         elif categories_pk:
             livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(categorie=categories_pk)))
         else:
-            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+            return super().list(request)
         
         serializer = self.get_serializer(livres, many=True)
         return self.get_paginated_response(serializer.data)
@@ -63,22 +63,8 @@ class LivreViewSet(viewsets.ModelViewSet):
                 categories = Categorie.objects.filter(pk=categories_pk)
                 serializer.save(categorie=livre.categorie.all() | categories)
             else:
-                return super().update(request)
-            return Response(serializer.data)
-        return Response(serializer.errors)
-    
-    def partial_update(self, request, pk, auteurs_pk=None, categories_pk=None):
-        livre = Livre.objects.get(pk=pk)
-        serializer = LivreSerializer(instance=livre, data=request.data)
-        if serializer.is_valid():
-            if auteurs_pk:
-                auteur = Auteur.objects.get(pk=auteurs_pk)
-                serializer.save(auteur=auteur)
-            elif categories_pk:
-                categories = Categorie.objects.filter(pk=categories_pk)
-                serializer.save(categorie=livre.categorie.all() | categories)
-            else:
-                serializer.save()
+                return super().update(request, pk)
+            
             return Response(serializer.data)
         return Response(serializer.errors)
     
@@ -91,8 +77,7 @@ class LivreViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors)
 
-        livre.delete()
-        return Response({'message': 'livre deleted'})
+        return super().destroy(request, pk)
     
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
@@ -103,7 +88,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
         if livres_pk:
             categories = self.queryset.filter(livre=livres_pk)
         else:
-            categories = self.filter_queryset(self.get_queryset()).filter()
+            return super().list(request)
     
         serializer = CategorieSerializer(categories, many=True)
         return Response(serializer.data)
@@ -115,7 +100,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
                 l = Livre.objects.filter(pk=livres_pk)
                 serializer.save(livre=l)
             else:
-                serializer.save()    
+                return super().create(request)
             return Response(serializer.data)
         return Response(serializer.errors)
 
@@ -127,7 +112,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
                 livres = Livre.objects.filter(pk=livres_pk)
                 serializer.save(livre=categorie.livre.all() | livres)
             else:
-                serializer.save()
+                return super().update(request, pk)
             return Response(serializer.data)
         return Response(serializer.errors)
     
@@ -140,9 +125,8 @@ class CategorieViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors)
         
-        categorie.delete()
-        return Response(status=204)
-
+        return super().destroy(request, pk)
+    
 class AuteurViewSet(viewsets.ModelViewSet):
     queryset = Auteur.objects.all()
     serializer_class = AuteurSerializer
@@ -151,7 +135,7 @@ class AuteurViewSet(viewsets.ModelViewSet):
         if livres_pk:
             auteurs = self.queryset.filter(livre=livres_pk)
         else:
-            auteurs = self.filter_queryset(self.get_queryset()).filter()
+            return super().list(request)
 
         serializer = AuteurSerializer(auteurs, many=True)
         return Response(serializer.data)
