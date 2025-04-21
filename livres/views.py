@@ -107,13 +107,4 @@ class CategorieViewSet(viewsets.ModelViewSet):
 class AuteurViewSet(viewsets.ModelViewSet):
     queryset = Auteur.objects.all()
     serializer_class = AuteurSerializer
-
-    def list(self, request, livres_pk=None):
-        if livres_pk:
-            auteurs = self.queryset.filter(livre=livres_pk)
-        else:
-            return super().list(request)
-
-        serializer = AuteurSerializer(auteurs, many=True)
-        return Response(serializer.data)
     
