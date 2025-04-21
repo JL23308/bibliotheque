@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, viewsets, filters
@@ -51,36 +51,34 @@ class LivreViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(livres, many=True)
         return self.get_paginated_response(serializer.data)
 
-    def update(self, request, pk, auteurs_pk=None, categories_pk=None):
-        livre = Livre.objects.get(pk=pk)
-
-        serializer = LivreSerializer(instance=livre, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            if auteurs_pk:
-                auteur = Auteur.objects.get(pk=auteurs_pk)
-                serializer.save(auteur=auteur)
-            elif categories_pk:
-                categories = Categorie.objects.filter(pk=categories_pk)
-                serializer.save(categorie=livre.categorie.all() | categories)
-            else:
-                return super().update(request, pk)
-            
-            return Response(serializer.data)
-        return Response(serializer.errors)
+    @action(detail=True, methods=['patch', 'put'], url_path='add-auteur/(?P<auteur_pk>\d+)')
+    def add_auteur(self, request, pk=None, auteur_pk=None):
+        livre = self.get_object()
+        auteur = get_object_or_404(Auteur, pk=auteur_pk)
+        livre.auteurs.add(auteur)
+        return Response({'status': 'auteur added'})
     
-    def destroy(self, request, pk, categories_pk=None):
-        livre = Livre.objects.get(pk=pk)
-        if categories_pk:
-            serializer = LivreSerializer(instance=livre, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(categorie=livre.categorie.all().exclude(pk=categories_pk))
-                return Response(serializer.data)
-            return Response(serializer.errors)
+    @action(detail=True, methods=['patch', 'put'], url_path='remove-auteur/(?P<auteur_pk>\d+)')
+    def remove_auteur(self, request, pk=None, auteur_pk=None):
+        livre = self.get_object()
+        auteur = get_object_or_404(Auteur, pk=auteur_pk)
+        livre.auteurs.remove(auteur)
+        return Response({'status': 'auteur removed'})
 
-        return super().destroy(request, pk)
+    @action(detail=True, methods=['patch', 'put'], url_path='add-categorie/(?P<categorie_pk>\d+)')
+    def add_categorie(self, request, pk=None, categorie_pk=None):
+        livre = self.get_object()
+        categorie = get_object_or_404(Categorie, pk=categorie_pk)
+        livre.categorie.add(categorie)
+        return Response({'status': 'categorie added'})
+    
+    @action(detail=True, methods=['patch', 'put'], url_path='remove-categorie/(?P<categorie_pk>\d+)')
+    def remove_categorie(self, request, pk=None, categorie_pk=None):
+        livre = self.get_object()
+        categorie = get_object_or_404(Categorie, pk=categorie_pk)
+        livre.categorie.remove(categorie)
+        return Response({'status': 'categorie removed'})
 
-    
-    
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
@@ -105,29 +103,6 @@ class CategorieViewSet(viewsets.ModelViewSet):
                 return super().create(request)
             return Response(serializer.data)
         return Response(serializer.errors)
-
-    def update(self, request, pk, livres_pk=None):
-        categorie = Categorie.objects.get(pk=pk)
-        serializer = CategorieSerializer(instance=categorie, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            if livres_pk:
-                livres = Livre.objects.filter(pk=livres_pk)
-                serializer.save(livre=categorie.livre.all() | livres)
-            else:
-                return super().update(request, pk)
-            return Response(serializer.data)
-        return Response(serializer.errors)
-    
-    def destroy(self, request,pk, livres_pk=None):
-        categorie = Categorie.objects.get(pk=pk)
-        if livres_pk:
-            serializer = CategorieSerializer(instance=categorie, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(livre=categorie.livre.all().exclude(pk=livres_pk))
-                return Response(serializer.data)
-            return Response(serializer.errors)
-        
-        return super().destroy(request, pk)
     
 class AuteurViewSet(viewsets.ModelViewSet):
     queryset = Auteur.objects.all()
