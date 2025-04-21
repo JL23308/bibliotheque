@@ -55,7 +55,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre = Livre.objects.get(pk=pk)
 
         serializer = LivreSerializer(instance=livre, data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             if auteurs_pk:
                 auteur = Auteur.objects.get(pk=auteurs_pk)
                 serializer.save(auteur=auteur)
@@ -72,12 +72,14 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre = Livre.objects.get(pk=pk)
         if categories_pk:
             serializer = LivreSerializer(instance=livre, data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save(categorie=livre.categorie.all().exclude(pk=categories_pk))
                 return Response(serializer.data)
             return Response(serializer.errors)
 
         return super().destroy(request, pk)
+
+    
     
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
@@ -107,7 +109,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
     def update(self, request, pk, livres_pk=None):
         categorie = Categorie.objects.get(pk=pk)
         serializer = CategorieSerializer(instance=categorie, data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             if livres_pk:
                 livres = Livre.objects.filter(pk=livres_pk)
                 serializer.save(livre=categorie.livre.all() | livres)
@@ -120,7 +122,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
         categorie = Categorie.objects.get(pk=pk)
         if livres_pk:
             serializer = CategorieSerializer(instance=categorie, data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save(livre=categorie.livre.all().exclude(pk=livres_pk))
                 return Response(serializer.data)
             return Response(serializer.errors)
