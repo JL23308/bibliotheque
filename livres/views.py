@@ -53,8 +53,6 @@ class LivreViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk, auteurs_pk=None, categories_pk=None):
         livre = Livre.objects.get(pk=pk)
-        if not self.get_permissions()[0].has_object_permission(request, LivreViewSet, livre):
-            raise PermissionError('not allowed')
 
         serializer = LivreSerializer(instance=livre, data=request.data)
         if serializer.is_valid():
@@ -65,7 +63,7 @@ class LivreViewSet(viewsets.ModelViewSet):
                 categories = Categorie.objects.filter(pk=categories_pk)
                 serializer.save(categorie=livre.categorie.all() | categories)
             else:
-                serializer.save()
+                return super().update(request)
             return Response(serializer.data)
         return Response(serializer.errors)
     
