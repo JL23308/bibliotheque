@@ -18,14 +18,17 @@ categorieRouter.register(r'categories', views.CategorieViewSet)
 domains3_router = routers.NestedSimpleRouter(categorieRouter, r'categories', lookup='categories')
 domains3_router.register(r'livres', views.LivreViewSet, basename='categories-livres')
 
+
+"""
+path('livres', views.LivreViewSet.as_view({
+    'get': 'list', 
+    'delete': 'destroy',
+    'post': 'create',
+    'put': 'update'
+    }), name='livres'),
+"""
 urlpatterns = [
-    path('livres', views.LivreViewSet.as_view({
-        'get': 'list', 
-        'delete': 'destroy',
-        'post': 'create',
-        'put': 'update'
-        }), name='livres'),
-    path(r'', include(livreRouter.urls),),
+    path(r'', include(livreRouter.urls)),
     path(r'', include(domains_router.urls)),
     path(r'', include(auteurRouter.urls)),
     path(r'', include(domains2_router.urls)),

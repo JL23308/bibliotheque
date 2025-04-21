@@ -11,8 +11,9 @@ class IsCreateurOrReadOnly(permissions.BasePermission):
     
     def has_permission(self, request, view):
         if request.data.get('isbn'):
-            livre = Livre.objects.get(isbn=request.data.get('isbn'))
-            return livre.createur_id == request.user.id
-        
+            livre = Livre.objects.filter(isbn=request.data.get('isbn'))
+            if livre :
+                return livre[0].createur_id == request.user.id
+            return True
         return super().has_permission(request, view)
                 

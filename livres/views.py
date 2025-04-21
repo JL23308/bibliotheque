@@ -91,7 +91,7 @@ class LivreViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors)
 
         livre.delete()
-        return redirect("/livres")
+        return Response({'message': 'livre deleted'})
     
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
