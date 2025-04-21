@@ -131,7 +131,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             if livres_pk:
                 livres = Livre.objects.filter(pk=livres_pk)
-                serializer.save(livres=categorie.livre.all() | livres)
+                serializer.save(livre=categorie.livre.all() | livres)
             else:
                 serializer.save()
             return Response(serializer.data)
