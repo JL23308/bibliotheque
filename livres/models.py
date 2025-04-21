@@ -27,7 +27,7 @@ class Livre(models.Model):
     titre = models.CharField(max_length=255, null=True, blank=True)
     auteur = models.ForeignKey(Auteur, on_delete=models.SET_NULL, null=True, blank=True)
     date_publication = models.DateField(max_length=255, null=True, blank=True)
-    isbn = models.CharField(max_length=255, null=True, blank=True, unique=True)
+    isbn = models.CharField(max_length=255, null=True, blank=True, unique=True, validators=[validate_isbn])
     createur = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     categorie = models.ManyToManyField(Categorie, related_name='livre')
 
