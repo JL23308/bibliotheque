@@ -53,6 +53,9 @@ class LivreViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk, auteurs_pk=None, categories_pk=None):
         livre = Livre.objects.get(pk=pk)
+        if not self.get_permissions()[0].has_object_permission(request, LivreViewSet, livre):
+            raise PermissionError('not allowed')
+
         serializer = LivreSerializer(instance=livre, data=request.data)
         if serializer.is_valid():
             if auteurs_pk:
@@ -92,15 +95,7 @@ class LivreViewSet(viewsets.ModelViewSet):
 
         livre.delete()
         return Response({'message': 'livre deleted'})
-    """
-    def get_permissions(self):
-        if self.action == 'update' :
-            permission_classes = [IsCreateurOrReadOnly]
-        elif self.action == 'destroy':
-            permission_classes = [permissions.IsAdminUser]
     
-        return permission_classes
-    """
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
