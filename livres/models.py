@@ -40,3 +40,5 @@ class Livre(models.Model):
         if errors:
             raise ValidationError(errors)
     
+        super().clean()
+        

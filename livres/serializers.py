@@ -66,8 +66,6 @@ class LivreSerializer(serializers.ModelSerializer):
             'createur',
             'categorie'
         ]
-        
-
 
     def validate_date_publication(self, value):
         if value:
