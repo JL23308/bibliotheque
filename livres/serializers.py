@@ -4,6 +4,7 @@ from .models import *
 from datetime import date
   
 from django.utils.translation import gettext_lazy as _
+from rest_framework.validators import UniqueTogetherValidator
 
 class LivrePublicSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
@@ -65,6 +66,7 @@ class LivreSerializer(serializers.ModelSerializer):
             'createur',
             'categorie'
         ]
+        
 
 
     def validate_date_publication(self, value):
@@ -73,8 +75,4 @@ class LivreSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(_(str(value) + " is in the future."))
         return value
     
-    """
-    def validate(self, data):
-
-        return data
-    """
+    

@@ -11,7 +11,7 @@ def validate_isbn(value):
     
     if not value.isdigit():
         raise ValidationError(_("%(value)s is incorrect. It must contain numbers only"), params={"value": value})
-        
+
 # Create your models here.
 
 class Auteur(models.Model):
@@ -29,7 +29,7 @@ class Livre(models.Model):
     date_publication = models.DateField(max_length=255, null=True, blank=True)
     isbn = models.CharField(max_length=255, null=True, blank=True, unique=True, validators=[validate_isbn])
     createur = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    categorie = models.ManyToManyField(Categorie, related_name='livre')
+    categorie = models.ManyToManyField(Categorie, related_name='livre', null=True, blank=True)
 
     def clean(self):
         errors = {}

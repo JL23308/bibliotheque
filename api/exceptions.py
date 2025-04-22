@@ -27,9 +27,11 @@ def custom_exception_handler(exc, context):
 def _handle_authentication_error(exc, context, response):
     if response : 
         response.data = {
-            'error' : 'Please login to proceed',
+            'detail' : 'Please login to proceed',
             'status_code' : response.status_code,
+            'error' : str(exc)
         }
+
     return response
 
 def _handle_generic_error(exc, context, response):
@@ -38,15 +40,26 @@ def _handle_generic_error(exc, context, response):
 def _handle_integrity_error(exc, context, response):
     if response : 
         response.data = {
-            'error' : 'The data you are trying to insert don\'t fit our database requirements',
+            'detail' : 'The data you are trying to insert don\'t fit our database requirements',
             'status_code' : response.status_code,
+            'error' : str(exc),
         }
+
     return response
 
 def _handle_permissions_error(exc, context, response):
     if response: 
         response.data = {
-            'error' : 'You are not allowed',
             'status_code' : response.status_code,
+            'error' : str(exc),
         }
+
+        if context:
+            details = {
+                'method': context.get('request').method,
+                'path' : context.get('request').path,
+                'permissions': [permission.__class__.__name__ for permission in context.get('view').get_permissions()]
+            }
+            response.data['details'] = details
+
     return response

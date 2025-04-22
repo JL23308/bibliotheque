@@ -8,3 +8,6 @@ class IsCreateurOrReadOnly(permissions.BasePermission):
             return True
         
         return obj.createur_id == request.user.id
+    
+    def __str__(self):
+        return "You must be the createur to edit a livre, else you can read it"

@@ -37,6 +37,7 @@ class LivreViewSet(viewsets.ModelViewSet):
                 serializer.save(createur=request.user)
             
             return Response(serializer.data)
+    
         return Response(serializer.errors)
     
     def list(self, request, auteurs_pk=None, categories_pk=None):
@@ -78,6 +79,9 @@ class LivreViewSet(viewsets.ModelViewSet):
         categorie = get_object_or_404(Categorie, pk=categorie_pk)
         livre.categorie.remove(categorie)
         return Response({'status': 'categorie removed'})
+    
+    def get_permissions(self):
+        return super().get_permissions()
 
 class CategorieViewSet(viewsets.ModelViewSet):
     queryset = Categorie.objects.all()
