@@ -8,6 +8,7 @@ def custom_exception_handler(exc, context):
         'PermissionDenied' : _handle_permissions_error,
         'NotAuthenticated' : _handle_authentication_error,
         'IntegrityError' : _handle_integrity_error,
+        'MethodNotAllowed': _handle_not_allowed_error,
     }
 
     # Call REST framework's default exception handler first,
@@ -63,3 +64,14 @@ def _handle_permissions_error(exc, context, response):
             response.data['details'] = details
 
     return response
+
+def _handle_not_allowed_error(exc, context, response):
+    if response : 
+        response.data = {
+            'detail' : 'Please login to proceed',
+            'status_code' : response.status_code,
+            'error' : str(exc)
+        }
+
+    return response
+    pass

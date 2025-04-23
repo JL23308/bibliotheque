@@ -378,7 +378,7 @@ class LivreApiTestCase(APITestCase):
         }
         
         response = self.client.post(url, livre_data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['titre'], 'new livre')
         self.assertEqual(response.data['date_publication'], '2025-01-01')
         self.assertEqual(response.data['isbn'], '7876789098765')
@@ -527,7 +527,7 @@ class LivreApiTestCase(APITestCase):
         }
         url = reverse('livres:livres-list')
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
         livre_data = {
             'titre': 'un nouveau titre',
@@ -584,5 +584,5 @@ class LivreApiTestCase(APITestCase):
         }
         url = reverse('livres:livres-list')
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         

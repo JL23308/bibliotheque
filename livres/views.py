@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, viewsets, filters
+from rest_framework import authentication, permissions, viewsets, filters, status
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -42,9 +42,9 @@ class LivreViewSet(viewsets.ModelViewSet):
             else :
                 serializer.save(createur=request.user)
             
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def list(self, request, auteurs_pk=None, categories_pk=None):
         livres = None
@@ -56,7 +56,7 @@ class LivreViewSet(viewsets.ModelViewSet):
             return super().list(request)
         
         serializer = self.get_serializer(livres, many=True)
-        return self.get_paginated_response(serializer.data)
+        return self.get_paginated_response(serializer.data, status=status.HTTP_200_OK)
 
     """
         Method that sets an Auteur to a Livre
@@ -85,7 +85,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.auteur = auteur
         livre.full_clean()
         livre.save()
-        return Response({'status': 'auteur added'})
+        return Response({'status': 'auteur added'}, status=status.HTTP_200_OK)
     
 
     """
@@ -115,7 +115,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.auteur = None
         livre.full_clean()
         livre.save()
-        return Response({'status': 'auteur removed'})
+        return Response({'status': 'auteur removed'}, status=status.HTTP_200_OK)
 
     """
         Method that adds a Categorie to a Livre
@@ -142,7 +142,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre = self.get_object()
         categorie = get_object_or_404(Categorie, pk=categorie_pk)
         livre.categorie.add(categorie)
-        return Response({'status': 'categorie added'})
+        return Response({'status': 'categorie added'}, status=status.HTTP_200_OK)
     
     """
         Method that removes a Categorie of a Livre
@@ -170,7 +170,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre = self.get_object()
         categorie = get_object_or_404(Categorie, pk=categorie_pk)
         livre.categorie.remove(categorie)
-        return Response({'status': 'categorie removed'})
+        return Response({'status': 'categorie removed'}, status=status.HTTP_200_OK)
     
     def get_permissions(self):
         return super().get_permissions()
@@ -190,7 +190,7 @@ class CategorieViewSet(viewsets.ModelViewSet):
             return super().list(request)
     
         serializer = CategorieSerializer(categories, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class AuteurViewSet(viewsets.ModelViewSet):
     """
