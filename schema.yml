@@ -1,0 +1,2721 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /api-token-auth/:
+    post:
+      operationId: api_token_auth_create
+      tags:
+      - api-token-auth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /auteurs/:
+    get:
+      operationId: auteurs_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - auteurs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuteurList'
+          description: ''
+    post:
+      operationId: auteurs_create
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+  /auteurs/{auteurs_pk}/livres/:
+    get:
+      operationId: auteurs_livres_list
+      parameters:
+      - in: query
+        name: auteur__nom
+        schema:
+          type: string
+      - in: query
+        name: auteur__prenom
+        schema:
+          type: string
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: categorie__nom
+        schema:
+          type: string
+      - in: query
+        name: date_publication_after
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: date_publication_before
+        schema:
+          type: string
+          format: date
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: titre
+        schema:
+          type: string
+      tags:
+      - auteurs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLivreList'
+          description: ''
+    post:
+      operationId: auteurs_livres_create
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /auteurs/{auteurs_pk}/livres/{id}/:
+    get:
+      operationId: auteurs_livres_retrieve
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    put:
+      operationId: auteurs_livres_update
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: auteurs_livres_partial_update
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    delete:
+      operationId: auteurs_livres_destroy
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /auteurs/{auteurs_pk}/livres/{id}/add-auteur/{auteur_pk}/:
+    put:
+      operationId: auteurs_livres_add_auteur_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: auteurs_livres_add_auteur_partial_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /auteurs/{auteurs_pk}/livres/{id}/add-categorie/{categorie_pk}/:
+    put:
+      operationId: auteurs_livres_add_categorie_update
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: auteurs_livres_add_categorie_partial_update
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /auteurs/{auteurs_pk}/livres/{id}/remove-auteur/{auteur_pk}/:
+    put:
+      operationId: auteurs_livres_remove_auteur_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: auteurs_livres_remove_auteur_partial_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /auteurs/{auteurs_pk}/livres/{id}/remove-categorie/{categorie_pk}/:
+    put:
+      operationId: auteurs_livres_remove_categorie_update
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: auteurs_livres_remove_categorie_partial_update
+      parameters:
+      - in: path
+        name: auteurs_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /auteurs/{id}/:
+    get:
+      operationId: auteurs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      tags:
+      - auteurs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+    put:
+      operationId: auteurs_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+    patch:
+      operationId: auteurs_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      tags:
+      - auteurs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAuteur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAuteur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAuteur'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+    delete:
+      operationId: auteurs_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      tags:
+      - auteurs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /categories/:
+    get:
+      operationId: categories_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - categories
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategorieList'
+          description: ''
+    post:
+      operationId: categories_create
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+  /categories/{categories_pk}/livres/:
+    get:
+      operationId: categories_livres_list
+      parameters:
+      - in: query
+        name: auteur__nom
+        schema:
+          type: string
+      - in: query
+        name: auteur__prenom
+        schema:
+          type: string
+      - in: query
+        name: categorie__nom
+        schema:
+          type: string
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: date_publication_after
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: date_publication_before
+        schema:
+          type: string
+          format: date
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: titre
+        schema:
+          type: string
+      tags:
+      - categories
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLivreList'
+          description: ''
+    post:
+      operationId: categories_livres_create
+      parameters:
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /categories/{categories_pk}/livres/{id}/:
+    get:
+      operationId: categories_livres_retrieve
+      parameters:
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    put:
+      operationId: categories_livres_update
+      parameters:
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: categories_livres_partial_update
+      parameters:
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    delete:
+      operationId: categories_livres_destroy
+      parameters:
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /categories/{categories_pk}/livres/{id}/add-auteur/{auteur_pk}/:
+    put:
+      operationId: categories_livres_add_auteur_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: categories_livres_add_auteur_partial_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /categories/{categories_pk}/livres/{id}/add-categorie/{categorie_pk}/:
+    put:
+      operationId: categories_livres_add_categorie_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: categories_livres_add_categorie_partial_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /categories/{categories_pk}/livres/{id}/remove-auteur/{auteur_pk}/:
+    put:
+      operationId: categories_livres_remove_auteur_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: categories_livres_remove_auteur_partial_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /categories/{categories_pk}/livres/{id}/remove-categorie/{categorie_pk}/:
+    put:
+      operationId: categories_livres_remove_categorie_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: categories_livres_remove_categorie_partial_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: categories_pk
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /categories/{id}/:
+    get:
+      operationId: categories_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      tags:
+      - categories
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+    put:
+      operationId: categories_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+    patch:
+      operationId: categories_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      tags:
+      - categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategorie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategorie'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategorie'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+    delete:
+      operationId: categories_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      tags:
+      - categories
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /livres/:
+    get:
+      operationId: livres_list
+      parameters:
+      - in: query
+        name: auteur__nom
+        schema:
+          type: string
+      - in: query
+        name: auteur__prenom
+        schema:
+          type: string
+      - in: query
+        name: categorie__nom
+        schema:
+          type: string
+      - in: query
+        name: date_publication_after
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: date_publication_before
+        schema:
+          type: string
+          format: date
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: titre
+        schema:
+          type: string
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLivreList'
+          description: ''
+    post:
+      operationId: livres_create
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /livres/{livres_pk}/auteurs/:
+    get:
+      operationId: livres_auteurs_list
+      parameters:
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuteurList'
+          description: ''
+    post:
+      operationId: livres_auteurs_create
+      parameters:
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+  /livres/{livres_pk}/auteurs/{id}/:
+    get:
+      operationId: livres_auteurs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+    put:
+      operationId: livres_auteurs_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Auteur'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+    patch:
+      operationId: livres_auteurs_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAuteur'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAuteur'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAuteur'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auteur'
+          description: ''
+    delete:
+      operationId: livres_auteurs_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this auteur.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /livres/{livres_pk}/categories/:
+    get:
+      operationId: livres_categories_list
+      parameters:
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategorieList'
+          description: ''
+    post:
+      operationId: livres_categories_create
+      parameters:
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+  /livres/{livres_pk}/categories/{id}/:
+    get:
+      operationId: livres_categories_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+    put:
+      operationId: livres_categories_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+    patch:
+      operationId: livres_categories_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategorie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategorie'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategorie'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+          description: ''
+    delete:
+      operationId: livres_categories_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this categorie.
+        required: true
+      - in: path
+        name: livres_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /livres/{id}/:
+    get:
+      operationId: livres_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    put:
+      operationId: livres_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: livres_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    delete:
+      operationId: livres_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /livres/{id}/add-auteur/{auteur_pk}/:
+    put:
+      operationId: livres_add_auteur_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: livres_add_auteur_partial_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /livres/{id}/add-categorie/{categorie_pk}/:
+    put:
+      operationId: livres_add_categorie_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: livres_add_categorie_partial_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /livres/{id}/remove-auteur/{auteur_pk}/:
+    put:
+      operationId: livres_remove_auteur_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: livres_remove_auteur_partial_update
+      parameters:
+      - in: path
+        name: auteur_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+  /livres/{id}/remove-categorie/{categorie_pk}/:
+    put:
+      operationId: livres_remove_categorie_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Livre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Livre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+    patch:
+      operationId: livres_remove_categorie_partial_update
+      parameters:
+      - in: path
+        name: categorie_pk
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this livre.
+        required: true
+      tags:
+      - livres
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLivre'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livre'
+          description: ''
+components:
+  schemas:
+    Auteur:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        prenom:
+          type: string
+          nullable: true
+          maxLength: 255
+        nom:
+          type: string
+          nullable: true
+          maxLength: 255
+        date_naissance:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - pk
+    AuteurPublic:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+        prenom:
+          type: string
+          readOnly: true
+        nom:
+          type: string
+          readOnly: true
+        date_naissance:
+          type: string
+          format: date
+          readOnly: true
+      required:
+      - date_naissance
+      - nom
+      - pk
+      - prenom
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    Categorie:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          nullable: true
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - id
+    CategoriePublic:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+      required:
+      - description
+      - nom
+      - pk
+    Livre:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        titre:
+          type: string
+          nullable: true
+          maxLength: 255
+        auteur:
+          allOf:
+          - $ref: '#/components/schemas/AuteurPublic'
+          readOnly: true
+        date_publication:
+          type: string
+          format: date
+          nullable: true
+        isbn:
+          type: string
+          nullable: true
+          maxLength: 13
+        createur:
+          allOf:
+          - $ref: '#/components/schemas/UserPublic'
+          readOnly: true
+        categorie:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoriePublic'
+          readOnly: true
+      required:
+      - auteur
+      - categorie
+      - createur
+      - pk
+    PaginatedAuteurList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Auteur'
+    PaginatedCategorieList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Categorie'
+    PaginatedLivreList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Livre'
+    PatchedAuteur:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        prenom:
+          type: string
+          nullable: true
+          maxLength: 255
+        nom:
+          type: string
+          nullable: true
+          maxLength: 255
+        date_naissance:
+          type: string
+          format: date
+          nullable: true
+    PatchedCategorie:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nom:
+          type: string
+          nullable: true
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 255
+    PatchedLivre:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        titre:
+          type: string
+          nullable: true
+          maxLength: 255
+        auteur:
+          allOf:
+          - $ref: '#/components/schemas/AuteurPublic'
+          readOnly: true
+        date_publication:
+          type: string
+          format: date
+          nullable: true
+        isbn:
+          type: string
+          nullable: true
+          maxLength: 13
+        createur:
+          allOf:
+          - $ref: '#/components/schemas/UserPublic'
+          readOnly: true
+        categorie:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoriePublic'
+          readOnly: true
+    UserPublic:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+      required:
+      - email
+      - first_name
+      - last_name
+      - pk
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
