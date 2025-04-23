@@ -1,0 +1,8 @@
+django==5.2
+djangorestframework
+pyyaml
+requests
+django-core-headers
+drf-nested-routers
+django-filter
+drf-spectacular
