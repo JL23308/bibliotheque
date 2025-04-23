@@ -16,17 +16,29 @@ def validate_isbn(value):
         raise ValidationError(_("%(value)s is incorrect. It must contain numbers only"), params={"value": value})
 
 # Create your models here.
-  
+
 class Auteur(models.Model):
+    """
+        Model that describes an author.
+        An author is related to many books (Livre)
+    """
     nom = models.CharField(max_length=255, null=True, blank=True)
     prenom = models.CharField(max_length=255, null=True, blank=True)
     date_naissance = models.DateField(null=True, blank=True)
 
 class Categorie(models.Model):
+    """
+        Model that describes a category.
+        An author is related to many books (Livre)
+    """
     nom = models.CharField(max_length=255, null=True, blank=True)
     description = models.CharField(max_length=255, null=True, blank=True)
 
 class Livre(models.Model):
+    """
+        Model that describes an book.
+        An author is related to one author and has many categories.
+    """
     titre = models.CharField(max_length=255, null=True, blank=True)
     auteur = models.ForeignKey(Auteur, on_delete=models.SET_NULL, null=True, blank=True)
     date_publication = models.DateField(max_length=255, null=True, blank=True)
@@ -34,6 +46,11 @@ class Livre(models.Model):
     createur = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     categorie = models.ManyToManyField(Categorie, related_name='livre', null=True, blank=True)
 
+    """
+        method that checks if nothing is wrong upon saving an entity
+        param: None
+        return: None
+    """
     def clean(self):
         errors = {}
         double = Livre.objects.filter(titre=self.titre, auteur=self.auteur)
