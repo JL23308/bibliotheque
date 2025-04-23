@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 
 #validators
 
@@ -15,7 +16,7 @@ def validate_isbn(value):
         raise ValidationError(_("%(value)s is incorrect. It must contain numbers only"), params={"value": value})
 
 # Create your models here.
-
+  
 class Auteur(models.Model):
     nom = models.CharField(max_length=255, null=True, blank=True)
     prenom = models.CharField(max_length=255, null=True, blank=True)

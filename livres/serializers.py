@@ -6,32 +6,29 @@ from datetime import date
 from django.utils.translation import gettext_lazy as _
 from rest_framework.validators import UniqueTogetherValidator
 
-"""
-If we need to display details about Livre in Categorie, Auteur or User
-
-class LivrePublicSerializer(serializers.Serializer):
+class LivreItemSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     titre = serializers.CharField(read_only=True)
     date_publication = serializers.DateField(read_only=True)
     isbn = serializers.CharField(read_only=True)
 
-class AuteurPublicSerializer(serializers.Serializer):
+class AuteurItemSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     prenom = serializers.CharField(read_only=True)
     nom = serializers.CharField(read_only=True)
     date_naissance = serializers.DateField(read_only=True)
 
-class CategoriePublicSerializer(serializers.Serializer):
+class CategorieItemSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     nom = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
 
-class UserPublicSerializer(serializers.Serializer):
+class UserItemSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True)
-"""
+
 
 #============================================
 
@@ -56,9 +53,9 @@ class AuteurSerializer(serializers.ModelSerializer):
         ]
 
 class LivreSerializer(serializers.ModelSerializer):
-    auteur = AuteurSerializer(read_only=True)
-    createur = UserSerializer(read_only=True)
-    categorie = CategorieSerializer(read_only=True, many=True)
+    auteur = AuteurItemSerializer(read_only=True)
+    createur = UserItemSerializer(read_only=True)
+    categorie = CategorieItemSerializer(read_only=True, many=True)
     class Meta:
         model = Livre
         fields = [

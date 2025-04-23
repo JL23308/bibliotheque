@@ -18,6 +18,7 @@ from .filters import *
 # Create your views here.
 
 class LivreViewSet(viewsets.ModelViewSet):
+
     queryset = Livre.objects.all()
     serializer_class = LivreSerializer
     permission_classes = [IsCreateurOrReadOnly, permissions.IsAuthenticatedOrReadOnly]
@@ -26,9 +27,26 @@ class LivreViewSet(viewsets.ModelViewSet):
     pagination_class = LivrePagination
     ordering_fields = ['titre', 'date_publication', 'auteur__nom']
 
+    def create(self, request, auteurs_pk=None, categories_pk=None):
+        serializer = LivreSerializer(data=request.data)
+        if(serializer.is_valid()):
+            if auteurs_pk:
+                auteur = get_object_or_404(Auteur, pk=auteurs_pk)
+                serializer.save(auteur=auteur, createur=request.user)
+            elif categories_pk:
+                categorie = Categorie.objects.filter(pk=categories_pk)
+                serializer.save(categorie=categorie, createur=request.user)    
+            else :
+                serializer.save(createur=request.user)
+            
+            return Response(serializer.data)
+    
+        return Response(serializer.errors)
+    
 
     @extend_schema(
         parameters=[
+            OpenApiParameter(name='request', required=True),
             OpenApiParameter(
                 name='auteurs_pk', 
                 required=False, 
@@ -36,7 +54,7 @@ class LivreViewSet(viewsets.ModelViewSet):
                 'the Livre related to that Auteur',
             ),
             OpenApiParameter(
-                name='categories_pk', 
+                name='auteurs_pk', 
                 required=False, 
                 description='Id of a Categorie. If an id is passed it will list all' \
                 'the Livre related to that Categorie',
@@ -49,8 +67,7 @@ class LivreViewSet(viewsets.ModelViewSet):
                 'Example 1',
                 description='We want to list all Livre from the API.' \
                 'Type in the url http://127.0.0.1:8000/livres/, this will ' \
-                'return a response that contains all the Livre and details about the request' \
-                'to the page',
+                'return a response that contains Livre and details about the request',
                 value="response"
             ),
         ],
@@ -112,8 +129,9 @@ class CategorieViewSet(viewsets.ModelViewSet):
     
         serializer = CategorieSerializer(categories, many=True)
         return Response(serializer.data)
-     
+    
 class AuteurViewSet(viewsets.ModelViewSet):
+
     queryset = Auteur.objects.all()
     serializer_class = AuteurSerializer
     
