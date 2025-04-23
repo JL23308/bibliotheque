@@ -24,7 +24,6 @@ class LivreViewSet(viewsets.ModelViewSet):
     ordering_fields = ['titre', 'date_publication', 'auteur__nom']
 
     def create(self, request, auteurs_pk=None, categories_pk=None):
-        request.data.createur = request.user.id
         serializer = LivreSerializer(data=request.data)
         if(serializer.is_valid()):
             if auteurs_pk:
