@@ -471,9 +471,98 @@ class LivreApiTestCase(APITestCase):
 
 
     def test_pagination(self):
-        pass
+        url = reverse('livres:livres-list')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data['results']), 3)
+
+        url = reverse('livres:livres-list', query={'page': '1'})
+        response = self.client.get(url)
+        self.assertEqual(len(response.data['results']), 3)
+
+        url = reverse('livres:livres-list', query={'page': '2'})
+        response = self.client.get(url)
+        self.assertEqual(len(response.data['results']), 1)
+
     
     def test_permissions(self):
-        pass
-    
+        url = reverse('livres:livres-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        livre_data = {
+            'titre': 'un nouveau titre',
+            'date_publication': '2023-02-01',
+            'isbn': '7298754383361',
+        }
+        url = reverse('livres:livres-list')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 401)
+ 
+        livre_data = {
+            'titre': 'un nouveau titre',
+            'date_publication': '2023-02-01',
+            'isbn': '7298754383361',
+        }
+        url = reverse('livres:livres-detail', kwargs={'pk': 1})
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, 401)
+
+        livre_data = {
+            'titre': 'un nouveau titre',
+        }
+        url = reverse('livres:livres-detail', kwargs={'pk': 1})
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, 401)
+
+        url = reverse('livres:livres-detail', kwargs={'pk': 1})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 401)
+
+        self.authenticate()
+
+        livre_data = {
+            'titre': 'un nouveau titre',
+            'date_publication': '2023-02-01',
+            'isbn': '7298754383361',
+        }
+        url = reverse('livres:livres-list')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+
+        livre_data = {
+            'titre': 'un nouveau titre',
+        }
+        url = reverse('livres:livres-detail', kwargs={'pk': 1})
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, 200)
+
+        livre_data = {
+            'titre': 'nouveau titre 1',
+            'date_publication': '2025-02-01',
+            'isbn': '2987091288361',
+        }
+        url = reverse('livres:livres-detail', kwargs={'pk': 1})
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, 200)
+
+        livre_data = {
+            'titre': 'un nouveau titre',
+        }
+        url = reverse('livres:livres-detail', kwargs={'pk': 2})
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, 403)
+
+        livre_data = {
+            'titre': 'nouveau titre 1',
+            'date_publication': '2025-02-01',
+            'isbn': '2987091288361',
+        }
+        url = reverse('livres:livres-detail', kwargs={'pk': 2})
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, 403)
+
+        
+
+
+        
     
