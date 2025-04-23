@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.cache import cache
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, viewsets, filters, status
@@ -43,20 +45,33 @@ class LivreViewSet(viewsets.ModelViewSet):
                 serializer.save(createur=request.user)
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def list(self, request, auteurs_pk=None, categories_pk=None):
-        livres = None
-        if auteurs_pk:
-            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(auteur=auteurs_pk)))
-        elif categories_pk:
-            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(categorie=categories_pk)))
-        else:
-            return super().list(request)
+
+        cache_key = 'my_unique_key' # needs to be unique
+        cache_time = 86400 # time in seconds for cache to be valid
+        livres = cache.get(cache_key) # returns None if no key-value pair
+        if not livres:
+            livres = None
+            if auteurs_pk:
+                livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(auteur=auteurs_pk)))
+            elif categories_pk:
+                livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(categorie=categories_pk)))
+            else:
+                return super().list(request) #marche pas pour les caches
+            
+            cache.set(cache_key, livres, cache_time)
         
+        #livres = self.paginate_queryset(self.filter_queryset(livres))
         serializer = self.get_serializer(livres, many=True)
+        return self.get_paginated_response(serializer.data)
+    """
+        return JsonResponse(data, safe=False)
+
         return self.get_paginated_response(serializer.data, status=status.HTTP_200_OK)
+    """
 
     """
         Method that sets an Auteur to a Livre
