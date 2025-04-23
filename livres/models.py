@@ -19,6 +19,7 @@ def validate_isbn(value):
   
 class Auteur(models.Model):
     """
+    test
         Model that describes an author.
         An author is related to many books (Livre)
     """
