@@ -43,35 +43,6 @@ class LivreViewSet(viewsets.ModelViewSet):
     
         return Response(serializer.errors)
     
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(name='request', required=True),
-            OpenApiParameter(
-                name='auteurs_pk', 
-                required=False, 
-                description='Id of an Auteur. If an id is passed it will list all' \
-                'the Livre related to that Auteur',
-            ),
-            OpenApiParameter(
-                name='auteurs_pk', 
-                required=False, 
-                description='Id of a Categorie. If an id is passed it will list all' \
-                'the Livre related to that Categorie',
-            )
-        ],
-        description='Function that list Livre',
-        auth=None,
-        examples=[
-            OpenApiExample(
-                'Example 1',
-                description='We want to list all Livre from the API.' \
-                'Type in the url http://127.0.0.1:8000/livres/, this will ' \
-                'return a response that contains Livre and details about the request',
-                value="response"
-            ),
-        ],
-    )   
     def list(self, request, auteurs_pk=None, categories_pk=None):
         livres = None
         if auteurs_pk:
