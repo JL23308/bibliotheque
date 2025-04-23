@@ -561,8 +561,28 @@ class LivreApiTestCase(APITestCase):
         response = self.client.put(url)
         self.assertEqual(response.status_code, 403)
 
-        
 
-
+    def test_create_api_key(self):
         
-    
+        url = reverse('token-auth')
+        user_data = {
+            'username': 'admin',
+            'password': 1234
+        }
+        response = self.client.post(url, user_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['token'], str(Token.objects.get(user=self.admin_user)))
+
+    def test_authenticate(self):
+        self.test_create_api_key()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + str(Token.objects.get(user=self.admin_user)))
+        
+        livre_data = {
+            'titre': 'un nouveau titre',
+            'date_publication': '2023-02-01',
+            'isbn': '7298754383361',
+        }
+        url = reverse('livres:livres-list')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        
