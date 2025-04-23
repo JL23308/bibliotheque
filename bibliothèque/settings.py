@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_dump_die',
     'django_filters',
     'drf_spectacular',
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_dump_die.middleware.DumpAndDieMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'bibliothèque.urls'
@@ -72,6 +74,11 @@ TEMPLATES = [
         },
     },
 ]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 
 WSGI_APPLICATION = 'bibliothèque.wsgi.application'
 
