@@ -18,15 +18,27 @@ def validate_isbn(value):
 # Create your models here.
   
 class Auteur(models.Model):
+    """
+        Model that describes an author.
+        An author is related to many books (Livre)
+    """
     nom = models.CharField(max_length=255, null=True, blank=True)
     prenom = models.CharField(max_length=255, null=True, blank=True)
     date_naissance = models.DateField(null=True, blank=True)
 
 class Categorie(models.Model):
+    """
+        Model that describes an category.
+        A categorie is related to many books (Livre)
+    """
     nom = models.CharField(max_length=255, null=True, blank=True)
     description = models.CharField(max_length=255, null=True, blank=True)
 
 class Livre(models.Model):
+    """
+        Model that describes an category.
+        A categorie is related to many books (Livre)
+    """
     titre = models.CharField(max_length=255, null=True, blank=True)
     auteur = models.ForeignKey(Auteur, on_delete=models.SET_NULL, null=True, blank=True)
     date_publication = models.DateField(max_length=255, null=True, blank=True)
