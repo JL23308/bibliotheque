@@ -6,7 +6,6 @@ app_name = 'livres'
 
 livreRouter = routers.DefaultRouter()
 livreRouter.register(r'livres', views.LivreViewSet,basename='livres')
-
 domains_router = routers.NestedSimpleRouter(livreRouter, r'livres', lookup='livres')
 domains_router.register(r'auteurs', views.AuteurViewSet, basename='livres-auteurs')
 domains_router.register(r'categories', views.CategorieViewSet, basename='livres-categories')

@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from drf_spectacular.utils import extend_schema
+
 #validators
 
 def validate_isbn(value):

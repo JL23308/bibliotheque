@@ -29,23 +29,29 @@ class LivreViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name='request', required=True),
-            OpenApiParameter(name='auteurs_pk', required=False, description='')
+            OpenApiParameter(
+                name='auteurs_pk', 
+                required=False, 
+                description='Id of an Auteur. If an id is passed it will list all' \
+                'the Livre related to that Auteur',
+            ),
+            OpenApiParameter(
+                name='categories_pk', 
+                required=False, 
+                description='Id of a Categorie. If an id is passed it will list all' \
+                'the Livre related to that Categorie',
+            )
         ],
-        # override default docstring extraction
-        description='More descriptive text',
-        # provide Authentication class that deviates from the views default
+        description='Function that list Livre',
         auth=None,
-        # change the auto-generated operation name
-        operation_id=None,
-        # or even completely override what AutoSchema would generate. Provide raw Open API spec as Dict.
-        operation=None,
-        # attach request/response examples to the operation.
         examples=[
             OpenApiExample(
                 'Example 1',
-                description='longer description',
-                value=""
+                description='We want to list all Livre from the API.' \
+                'Type in the url http://127.0.0.1:8000/livres/, this will ' \
+                'return a response that contains all the Livre and details about the request' \
+                'to the page',
+                value="response"
             ),
         ],
     )   

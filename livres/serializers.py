@@ -6,6 +6,9 @@ from datetime import date
 from django.utils.translation import gettext_lazy as _
 from rest_framework.validators import UniqueTogetherValidator
 
+"""
+If we need to display details about Livre in Categorie, Auteur or User
+
 class LivrePublicSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     titre = serializers.CharField(read_only=True)
@@ -28,6 +31,7 @@ class UserPublicSerializer(serializers.Serializer):
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True)
+"""
 
 #============================================
 
@@ -52,9 +56,9 @@ class AuteurSerializer(serializers.ModelSerializer):
         ]
 
 class LivreSerializer(serializers.ModelSerializer):
-    auteur = AuteurPublicSerializer(read_only=True)
-    createur = UserPublicSerializer(read_only=True)
-    categorie = CategoriePublicSerializer(read_only=True, many=True)
+    auteur = AuteurSerializer(read_only=True)
+    createur = UserSerializer(read_only=True)
+    categorie = CategorieSerializer(read_only=True, many=True)
     class Meta:
         model = Livre
         fields = [
