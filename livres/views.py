@@ -5,6 +5,9 @@ from rest_framework import authentication, permissions, viewsets, filters
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+
 from .permissions import *
 from api.pagination import *
 
@@ -23,22 +26,29 @@ class LivreViewSet(viewsets.ModelViewSet):
     pagination_class = LivrePagination
     ordering_fields = ['titre', 'date_publication', 'auteur__nom']
 
-    def create(self, request, auteurs_pk=None, categories_pk=None):
-        serializer = LivreSerializer(data=request.data)
-        if(serializer.is_valid()):
-            if auteurs_pk:
-                auteur = get_object_or_404(Auteur, pk=auteurs_pk)
-                serializer.save(auteur=auteur, createur=request.user)
-            elif categories_pk:
-                categorie = Categorie.objects.filter(pk=categories_pk)
-                serializer.save(categorie=categorie, createur=request.user)    
-            else :
-                serializer.save(createur=request.user)
-            
-            return Response(serializer.data)
-    
-        return Response(serializer.errors)
-    
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='request', required=True),
+            OpenApiParameter(name='auteurs_pk', required=False, description='')
+        ],
+        # override default docstring extraction
+        description='More descriptive text',
+        # provide Authentication class that deviates from the views default
+        auth=None,
+        # change the auto-generated operation name
+        operation_id=None,
+        # or even completely override what AutoSchema would generate. Provide raw Open API spec as Dict.
+        operation=None,
+        # attach request/response examples to the operation.
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='longer description',
+                value=""
+            ),
+        ],
+    )   
     def list(self, request, auteurs_pk=None, categories_pk=None):
         livres = None
         if auteurs_pk:
@@ -83,9 +93,10 @@ class LivreViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 class CategorieViewSet(viewsets.ModelViewSet):
+
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
-    
+
     def list(self, request, livres_pk=None):
         categories = None
         if livres_pk:
@@ -96,17 +107,6 @@ class CategorieViewSet(viewsets.ModelViewSet):
         serializer = CategorieSerializer(categories, many=True)
         return Response(serializer.data)
      
-    def create(self, request, livres_pk=None):                
-        serializer = CategorieSerializer(data=request.data)
-        if serializer.is_valid():    
-            if livres_pk:
-                l = Livre.objects.filter(pk=livres_pk)
-                serializer.save(livre=l)
-            else:
-                return super().create(request)
-            return Response(serializer.data)
-        return Response(serializer.errors)
-    
 class AuteurViewSet(viewsets.ModelViewSet):
     queryset = Auteur.objects.all()
     serializer_class = AuteurSerializer
