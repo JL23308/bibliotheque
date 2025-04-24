@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.cache import cache
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, viewsets, filters
+from rest_framework import authentication, permissions, viewsets, filters, status
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -42,21 +44,50 @@ class LivreViewSet(viewsets.ModelViewSet):
             else :
                 serializer.save(createur=request.user)
             
-            return Response(serializer.data)
-    
-        return Response(serializer.errors)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def list(self, request, auteurs_pk=None, categories_pk=None):
-        livres = None
+        cache_key = 'livres-list-%s-%s' % (auteurs_pk, categories_pk)
+        for key, item in request.query_params.items():
+            cache_key += "-%s-%s" % (key, item)
+        
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair    
+       
+        if data:
+            self.paginator.page = data[0]
+            self.paginator.request = request
+            self.paginator.display_page_controls = True
+            return self.get_paginated_response(data[1]) 
+            
         if auteurs_pk:
             livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(auteur=auteurs_pk)))
         elif categories_pk:
             livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(categorie=categories_pk)))
         else:
-            return super().list(request)
-        
+            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+       
         serializer = self.get_serializer(livres, many=True)
+        cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
         return self.get_paginated_response(serializer.data)
+    
+    def retrieve(self, request, pk, categories_pk=None, auteurs_pk=None):
+        
+        cache_key = 'livres-%s' % (pk)
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if not data:
+            livre = self.queryset.get(pk=pk)
+            serializer = LivreSerializer(livre)
+            cache.set(cache_key, serializer.data, cache_time)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(data, status=status.HTTP_200_OK)
 
     """
         Method that sets an Auteur to a Livre
@@ -78,6 +109,16 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/set-auteur/1/
             response : {'status': 'auteur added'}
     """
+    @extend_schema(
+        description='Method that sets an Auteur to a Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/set-auteur/1/',
+                value="{'status': 'auteur added'}"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='set-auteur/(?P<auteur_pk>\d+)')
     def set_auteur(self, request, pk=None, auteur_pk=None):
         livre = self.get_object()
@@ -85,7 +126,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.auteur = auteur
         livre.full_clean()
         livre.save()
-        return Response({'status': 'auteur added'})
+        return Response({'status': 'auteur added'}, status=status.HTTP_200_OK)
     
 
     """
@@ -108,6 +149,17 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/remove-auteur/1/
             response : {'status': 'auteur removed'}
     """
+
+    @extend_schema(
+        description='Method that removes an Auteur from Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/remove-auteur/1/',
+                value="{'status': 'auteur removed'}"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='remove-auteur/(?P<auteur_pk>\d+)')
     def remove_auteur(self, request, pk=None, auteur_pk=None):
         livre = self.get_object()
@@ -115,7 +167,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.auteur = None
         livre.full_clean()
         livre.save()
-        return Response({'status': 'auteur removed'})
+        return Response({'status': 'auteur removed'}, status=status.HTTP_200_OK)
 
     """
         Method that adds a Categorie to a Livre
@@ -137,12 +189,23 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/add-categorie/1/
             response : {'status': 'categorie added'}
     """
+
+    @extend_schema(
+        description='Method that adds a Categorie to a Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/add-categorie/1/',
+                value="{'status': 'categorie added'}"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='add-categorie/(?P<categorie_pk>\d+)')
     def add_categorie(self, request, pk=None, categorie_pk=None):
         livre = self.get_object()
         categorie = get_object_or_404(Categorie, pk=categorie_pk)
         livre.categorie.add(categorie)
-        return Response({'status': 'categorie added'})
+        return Response({'status': 'categorie added'}, status=status.HTTP_200_OK)
     
     """
         Method that removes a Categorie of a Livre
@@ -165,12 +228,22 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/remove-categorie/1/
             response : {'status': 'categorie removed'}
     """
+    @extend_schema(
+        description='Method that removes a Categorie from a Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/remove-categorie/1/',
+                value="{'status': 'categorie removed'   }"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='remove-categorie/(?P<categorie_pk>\d+)')
     def remove_categorie(self, request, pk=None, categorie_pk=None):
         livre = self.get_object()
         categorie = get_object_or_404(Categorie, pk=categorie_pk)
         livre.categorie.remove(categorie)
-        return Response({'status': 'categorie removed'})
+        return Response({'status': 'categorie removed'}, status=status.HTTP_200_OK)
     
     def get_permissions(self):
         return super().get_permissions()
@@ -183,14 +256,39 @@ class CategorieViewSet(viewsets.ModelViewSet):
     serializer_class = CategorieSerializer
 
     def list(self, request, livres_pk=None):
-        categories = None
-        if livres_pk:
-            categories = self.queryset.filter(livre=livres_pk)
-        else:
-            return super().list(request)
-    
-        serializer = CategorieSerializer(categories, many=True)
-        return Response(serializer.data)
+        cache_key = 'categories-list-%s' % (livres_pk)    
+        cache_time = 86400 # time in seconds for cache to be valid
+        data = cache.get(cache_key) # returns None if no key-value pair    
+
+        if not data: 
+        
+            if livres_pk:
+                #categories = self.queryset.filter(livre=livres_pk)
+                categories = Livre.objects.prefetch_related("categorie").get(pk=livres_pk).categorie.all()
+            else:
+                categories = self.queryset
+            
+            serializer = CategorieSerializer(categories, many=True)
+            data=serializer.data
+            cache.set(cache_key, data, cache_time)
+        
+        return Response(data, status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, pk, livres_pk=None):
+        
+        cache_key = 'categories-%s' % (pk)
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if not data:
+            categorie = self.queryset.get(pk=pk)
+            serializer = CategorieSerializer(categorie)
+            cache.set(cache_key, serializer.data, cache_time)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(data, status=status.HTTP_200_OK)
     
 class AuteurViewSet(viewsets.ModelViewSet):
     """
@@ -198,4 +296,38 @@ class AuteurViewSet(viewsets.ModelViewSet):
     """
     queryset = Auteur.objects.all()
     serializer_class = AuteurSerializer
+
+    def list(self, request, livres_pk=None):
+        
+        cache_key = 'auteurs-list-%s' % (livres_pk)    
+        cache_time = 86400 # time in seconds for cache to be valid
+        data = cache.get(cache_key) # returns None if no key-value pair    
+        
+        if not data: 
+            if livres_pk:
+                auteur = self.queryset.filter(livre=livres_pk)
+            else:
+                auteur = self.queryset
+            
+            serializer = AuteurSerializer(auteur, many=True)
+            data=serializer.data
+            cache.set(cache_key, data, cache_time)
+            
+        return Response(data, status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, pk, livres_pk=None):
+        
+        cache_key = 'auteurs-%s' % (pk)
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if not data:
+            auteur = self.queryset.get(pk=pk)
+            serializer = AuteurSerializer(auteur)
+            cache.set(cache_key, serializer.data, cache_time)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(data, status=status.HTTP_200_OK)
     

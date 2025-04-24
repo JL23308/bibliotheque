@@ -5,6 +5,7 @@ from .serializers import *
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from django.core.cache import cache
 
 # Create your tests here.
 
@@ -295,6 +296,7 @@ class LivreSerializerTestCase(TestCase):
 
 class LivreApiTestCase(APITestCase):
     def setUp(self):
+        cache
         self.admin_user = User.objects.create_superuser(username='admin', password='1234')
         self.normal_user = User.objects.create_user(username='user', password='1234')
 
@@ -378,7 +380,7 @@ class LivreApiTestCase(APITestCase):
         }
         
         response = self.client.post(url, livre_data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['titre'], 'new livre')
         self.assertEqual(response.data['date_publication'], '2025-01-01')
         self.assertEqual(response.data['isbn'], '7876789098765')
@@ -471,6 +473,7 @@ class LivreApiTestCase(APITestCase):
 
 
     def test_pagination(self):
+        cache.clear()
         url = reverse('livres:livres-list')
         response = self.client.get(url)
         self.assertEqual(len(response.data['results']), 3)
@@ -527,7 +530,7 @@ class LivreApiTestCase(APITestCase):
         }
         url = reverse('livres:livres-list')
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
         livre_data = {
             'titre': 'un nouveau titre',
@@ -584,5 +587,5 @@ class LivreApiTestCase(APITestCase):
         }
         url = reverse('livres:livres-list')
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         
