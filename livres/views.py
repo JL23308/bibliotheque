@@ -74,6 +74,20 @@ class LivreViewSet(viewsets.ModelViewSet):
         cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
         return self.get_paginated_response(serializer.data)
     
+    def retrieve(self, request, pk, categories_pk=None, auteurs_pk=None):
+        
+        cache_key = 'livres-%s' % (pk)
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if not data:
+            livre = self.queryset.get(pk=pk)
+            serializer = LivreSerializer(livre)
+            cache.set(cache_key, serializer.data, cache_time)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(data, status=status.HTTP_200_OK)
 
     """
         Method that sets an Auteur to a Livre
@@ -95,6 +109,16 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/set-auteur/1/
             response : {'status': 'auteur added'}
     """
+    @extend_schema(
+        description='Method that removes an Auteur from Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/auteur/1/',
+                value="{'status': 'auteur removed'}"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='set-auteur/(?P<auteur_pk>\d+)')
     def set_auteur(self, request, pk=None, auteur_pk=None):
         livre = self.get_object()
@@ -200,21 +224,36 @@ class CategorieViewSet(viewsets.ModelViewSet):
     serializer_class = CategorieSerializer
 
     def list(self, request, livres_pk=None):
-        cache_key = 'categorie-list-%s' % (livres_pk)    
+        cache_key = 'categories-list-%s' % (livres_pk)    
         cache_time = 86400 # time in seconds for cache to be valid
         data = cache.get(cache_key) # returns None if no key-value pair    
 
         if not data: 
-            categories = None
             if livres_pk:
                 categories = self.queryset.filter(livre=livres_pk)
             else:
-                return super().list(request)
-        
+                categories = self.queryset
+            
             serializer = CategorieSerializer(categories, many=True)
             data=serializer.data
             cache.set(cache_key, data, cache_time)
             
+        return Response(data, status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, pk, livres_pk=None):
+        
+        cache_key = 'categories-%s' % (pk)
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if not data:
+            categorie = self.queryset.get(pk=pk)
+            serializer = CategorieSerializer(categorie)
+            cache.set(cache_key, serializer.data, cache_time)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(data, status=status.HTTP_200_OK)
     
 class AuteurViewSet(viewsets.ModelViewSet):
@@ -223,4 +262,37 @@ class AuteurViewSet(viewsets.ModelViewSet):
     """
     queryset = Auteur.objects.all()
     serializer_class = AuteurSerializer
+
+    def list(self, request, livres_pk=None):
+        cache_key = 'auteurs-list-%s' % (livres_pk)    
+        cache_time = 86400 # time in seconds for cache to be valid
+        data = cache.get(cache_key) # returns None if no key-value pair    
+        
+        if not data: 
+            if livres_pk:
+                auteur = self.queryset.filter(livre=livres_pk)
+            else:
+                auteur = self.queryset
+            
+            serializer = AuteurSerializer(auteur, many=True)
+            data=serializer.data
+            cache.set(cache_key, data, cache_time)
+            
+        return Response(data, status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, pk, livres_pk=None):
+        
+        cache_key = 'auteurs-%s' % (pk)
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if not data:
+            auteur = self.queryset.get(pk=pk)
+            serializer = AuteurSerializer(auteur)
+            cache.set(cache_key, serializer.data, cache_time)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(data, status=status.HTTP_200_OK)
     
