@@ -5,6 +5,7 @@ from .serializers import *
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from django.core.cache import cache
 
 # Create your tests here.
 
@@ -295,6 +296,7 @@ class LivreSerializerTestCase(TestCase):
 
 class LivreApiTestCase(APITestCase):
     def setUp(self):
+        cache
         self.admin_user = User.objects.create_superuser(username='admin', password='1234')
         self.normal_user = User.objects.create_user(username='user', password='1234')
 
@@ -471,6 +473,7 @@ class LivreApiTestCase(APITestCase):
 
 
     def test_pagination(self):
+        cache.clear()
         url = reverse('livres:livres-list')
         response = self.client.get(url)
         self.assertEqual(len(response.data['results']), 3)

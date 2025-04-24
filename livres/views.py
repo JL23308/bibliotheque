@@ -110,12 +110,12 @@ class LivreViewSet(viewsets.ModelViewSet):
             response : {'status': 'auteur added'}
     """
     @extend_schema(
-        description='Method that removes an Auteur from Livre',
+        description='Method that sets an Auteur to a Livre',
         examples=[
             OpenApiExample(
                 'Example 1',
-                description='method put on /livres/1/auteur/1/',
-                value="{'status': 'auteur removed'}"
+                description='method put on /livres/1/set-auteur/1/',
+                value="{'status': 'auteur added'}"
             ),
         ],
     )
@@ -149,6 +149,17 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/remove-auteur/1/
             response : {'status': 'auteur removed'}
     """
+
+    @extend_schema(
+        description='Method that removes an Auteur from Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/remove-auteur/1/',
+                value="{'status': 'auteur removed'}"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='remove-auteur/(?P<auteur_pk>\d+)')
     def remove_auteur(self, request, pk=None, auteur_pk=None):
         livre = self.get_object()
@@ -178,6 +189,17 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/add-categorie/1/
             response : {'status': 'categorie added'}
     """
+
+    @extend_schema(
+        description='Method that adds a Categorie to a Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/add-categorie/1/',
+                value="{'status': 'categorie added'}"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='add-categorie/(?P<categorie_pk>\d+)')
     def add_categorie(self, request, pk=None, categorie_pk=None):
         livre = self.get_object()
@@ -206,6 +228,16 @@ class LivreViewSet(viewsets.ModelViewSet):
             put /livres/1/remove-categorie/1/
             response : {'status': 'categorie removed'}
     """
+    @extend_schema(
+        description='Method that removes a Categorie from a Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/remove-categorie/1/',
+                value="{'status': 'categorie removed'   }"
+            ),
+        ],
+    )
     @action(detail=True, methods=['patch', 'put'], url_path='remove-categorie/(?P<categorie_pk>\d+)')
     def remove_categorie(self, request, pk=None, categorie_pk=None):
         livre = self.get_object()
@@ -229,15 +261,17 @@ class CategorieViewSet(viewsets.ModelViewSet):
         data = cache.get(cache_key) # returns None if no key-value pair    
 
         if not data: 
+        
             if livres_pk:
-                categories = self.queryset.filter(livre=livres_pk)
+                #categories = self.queryset.filter(livre=livres_pk)
+                categories = Livre.objects.prefetch_related("categorie").get(pk=livres_pk).categorie.all()
             else:
                 categories = self.queryset
             
             serializer = CategorieSerializer(categories, many=True)
             data=serializer.data
             cache.set(cache_key, data, cache_time)
-            
+        
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -264,6 +298,7 @@ class AuteurViewSet(viewsets.ModelViewSet):
     serializer_class = AuteurSerializer
 
     def list(self, request, livres_pk=None):
+        
         cache_key = 'auteurs-list-%s' % (livres_pk)    
         cache_time = 86400 # time in seconds for cache to be valid
         data = cache.get(cache_key) # returns None if no key-value pair    
