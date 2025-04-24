@@ -49,29 +49,31 @@ class LivreViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def list(self, request, auteurs_pk=None, categories_pk=None):
-
-        cache_key = 'my_unique_key' # needs to be unique
-        cache_time = 86400 # time in seconds for cache to be valid
-        livres = cache.get(cache_key) # returns None if no key-value pair
-        if not livres:
-            livres = None
-            if auteurs_pk:
-                livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(auteur=auteurs_pk)))
-            elif categories_pk:
-                livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(categorie=categories_pk)))
-            else:
-                return super().list(request) #marche pas pour les caches
-            
-            cache.set(cache_key, livres, cache_time)
+        cache_key = 'livres-list-%s-%s' % (auteurs_pk, categories_pk)
+        for key, item in request.query_params.items():
+            cache_key += "-%s-%s" % (key, item)
         
-        #livres = self.paginate_queryset(self.filter_queryset(livres))
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair    
+       
+        if data:
+            self.paginator.page = data[0]
+            self.paginator.request = request
+            self.paginator.display_page_controls = True
+            return self.get_paginated_response(data[1]) 
+            
+        if auteurs_pk:
+            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(auteur=auteurs_pk)))
+        elif categories_pk:
+            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(categorie=categories_pk)))
+        else:
+            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+       
         serializer = self.get_serializer(livres, many=True)
+        cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
         return self.get_paginated_response(serializer.data)
-    """
-        return JsonResponse(data, safe=False)
-
-        return self.get_paginated_response(serializer.data, status=status.HTTP_200_OK)
-    """
+    
 
     """
         Method that sets an Auteur to a Livre
@@ -198,14 +200,22 @@ class CategorieViewSet(viewsets.ModelViewSet):
     serializer_class = CategorieSerializer
 
     def list(self, request, livres_pk=None):
-        categories = None
-        if livres_pk:
-            categories = self.queryset.filter(livre=livres_pk)
-        else:
-            return super().list(request)
-    
-        serializer = CategorieSerializer(categories, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        cache_key = 'categorie-list-%s' % (livres_pk)    
+        cache_time = 86400 # time in seconds for cache to be valid
+        data = cache.get(cache_key) # returns None if no key-value pair    
+
+        if not data: 
+            categories = None
+            if livres_pk:
+                categories = self.queryset.filter(livre=livres_pk)
+            else:
+                return super().list(request)
+        
+            serializer = CategorieSerializer(categories, many=True)
+            data=serializer.data
+            cache.set(cache_key, data, cache_time)
+            
+        return Response(data, status=status.HTTP_200_OK)
     
 class AuteurViewSet(viewsets.ModelViewSet):
     """
