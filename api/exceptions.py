@@ -82,8 +82,18 @@ def _handle_permissions_error(exc, context, response):
                 response.data['detail'] = 'You have to be an admin to access this page.'
             else:
                 response.data['detail'] = 'You have to be an admin to proceed'    
-            
+        
+        elif view.__class__.__name__ == 'LivreViewSet':
+            response.data['detail'] = 'You must be the creator of the book to edit or delete it.'
+
     return response
 
 def _handle_not_allowed_error(exc, context, response):
+    if response : 
+        response.data = {
+            'detail' : 'You are not allowed to use the method ' + context['request'].method + ' in this url, the allowed methods are ' + str(context['view'].allowed_methods) ,
+            'status_code' : response.status_code,
+            'error' : str(exc),
+        }
+
     return response
