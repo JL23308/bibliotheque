@@ -15,3 +15,6 @@ class LivreFilterSet(django_filters.FilterSet):
             'date_publication',
             'categorie__nom',
             ]
+        
+
+    

@@ -234,7 +234,7 @@ class LivreViewSet(viewsets.ModelViewSet):
             OpenApiExample(
                 'Example 1',
                 description='method put on /livres/1/remove-categorie/1/',
-                value="{'status': 'categorie removed'   }"
+                value="{'status': 'categorie removed'}"
             ),
         ],
     )
@@ -331,3 +331,12 @@ class AuteurViewSet(viewsets.ModelViewSet):
 
         return Response(data, status=status.HTTP_200_OK)
     
+
+"""
+class AvisViewSet(viewsets.ModelVIewSet):
+    pass
+
+class EmpruntViewSet(viewsets.ModelVIewSet):
+    pass
+    
+"""

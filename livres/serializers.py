@@ -46,6 +46,7 @@ class UserItemSerializer(serializers.Serializer):
     email = serializers.EmailField(read_only=True)
 
 
+
 #============================================
 
 class UserSerializer(serializers.ModelSerializer):
@@ -118,5 +119,6 @@ class LivreSerializer(serializers.ModelSerializer):
             if value > date.today():
                 raise serializers.ValidationError(_(str(value) + " is in the future."))
         return value
-    
+
+   
     

@@ -8,4 +8,6 @@ class IsCreateurOrReadOnly(permissions.BasePermission):
             return True
 
         return obj.createur_id == request.user.id
-                
+
+class IsAdminOrMembre(permissions.BasePermission):
+    pass

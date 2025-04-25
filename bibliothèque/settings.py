@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     "debug_toolbar",
+    'emprunts'
 ]
 
 MIDDLEWARE = [
