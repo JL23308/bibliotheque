@@ -1,4 +1,6 @@
 from rest_framework.views import exception_handler
+from rest_framework import permissions
+from django.contrib.auth.models import AnonymousUser
 
 def custom_exception_handler(exc, context):
 
@@ -49,29 +51,36 @@ def _handle_integrity_error(exc, context, response):
     return response
 
 def _handle_permissions_error(exc, context, response):
+    request = context['request']
+    method = request.method.lower()
+    view = context['view']
     if response: 
+        
         response.data = {
             'status_code' : response.status_code,
             'error' : str(exc),
         }
 
-        if context:
-            details = {
-                'method': context.get('request').method,
-                'path' : context.get('request').path,
-                'permissions': [permission.__class__.__name__ for permission in context.get('view').get_permissions()]
-            }
-            response.data['details'] = details
+        if view.__class__.__name__ == 'EmpruntViewSet':
+
+            if method == 'post':
+                response.data['detail'] = 'You have to be a member to book a book'
+            
+            elif method in ['put', 'patch']:
+                response.data['detail'] = 'You can\'t edit an Emprunt unless you\'re an admin'
+            
+            elif method == 'delete' or method in permissions.SAFE_METHODS:
+                response.data['detail'] = 'This Emprunt doesn\'t belong to you.'
+    
+        elif view.__class__.__name__ == 'AvisViewSet':
+
+            if method == 'post':
+                response.data['detail'] = 'You have to be a member to share your opinion'
+            
+            elif method in ['delete', 'put', 'patch']:
+                response.data['detail'] = 'This Emprunt doesn\'t belong to you, you can\'t delete it'
 
     return response
 
 def _handle_not_allowed_error(exc, context, response):
-    if response : 
-        response.data = {
-            'detail' : 'Please login to proceed',
-            'status_code' : response.status_code,
-            'error' : str(exc)
-        }
-
     return response
-    pass

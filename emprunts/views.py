@@ -129,7 +129,7 @@ class AvisViewSet(viewsets.ModelViewSet):
     
     queryset = Avis.objects.all()
     serializer_class = AvisSerializer
-    #permission_classes = [IsAdminOrMembre]   
+    permission_classes = [IsAdminOrMembre, permissions.IsAuthenticatedOrReadOnly]   
     pagination_class = AvisPagination
     filterset_class = AvisFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
@@ -218,4 +218,3 @@ class AvisViewSet(viewsets.ModelViewSet):
     
         return Response({'status': 'this avis has no livre'}, status=status.HTTP_400_BAD_REQUEST)
     
-

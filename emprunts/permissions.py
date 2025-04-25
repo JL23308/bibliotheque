@@ -14,13 +14,19 @@ class IsAdminOrMembre(permissions.BasePermission):
                 
             if request.method == 'delete':
                 return obj.membre.user.id == request.user.id  
-        """
+        
+        #====================================================
+
         if view.__class__.__name__ == 'AvisViewSet':
             if request.method in permissions.SAFE_METHODS:
                 return True
-            return obj.membre.user.id == request.user.id
-        """
+            
+            if type(request.user) != AnonymousUser:
+                return obj.membre.user.id == request.user.id
+            
 
+        #====================================================
+        
         return False
     
     def has_permission(self, request, view):
@@ -33,6 +39,16 @@ class IsAdminOrMembre(permissions.BasePermission):
                 
             if request.method == 'post':
                 return request.user.membre
+            
+        #====================================================
+        
+        if view.__class__.__name__ == 'AvisViewSet':
+            if request.method in permissions.SAFE_METHODS:
+                return True
+            
+            if request.method == 'post':
+                return request.user.membre
+            
 
         return False
    
