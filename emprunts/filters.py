@@ -19,6 +19,19 @@ class EmpruntFilterSet(django_filters.FilterSet):
             'membre__user__first_name',
             'membre__user__last_name'
         ]
+
+class AvisFilterSet(django_filters.FilterSet):
+    commentaire = django_filters.CharFilter(lookup_expr='icontains', field_name='commentaire')
+    livre__titre = django_filters.CharFilter(lookup_expr='icontains', field_name='livre__titre')
+    
+    class Meta:
+        model = Avis
+        fields = [
+            'note',
+            'commentaire',
+            'livre__titre',
+            'membre'
+        ]
         
 
     

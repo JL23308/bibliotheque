@@ -68,11 +68,13 @@ class EmpruntViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch', 'put'], url_path='remove-membre/(?P<membre_pk>\d+)')
     def remove_membre(self, request, pk=None, membre_pk=None):
         emprunt = self.get_object()
-        membre = get_object_or_404(Membre, pk=membre_pk)
-        emprunt.membre = None
-        emprunt.full_clean()
-        emprunt.save()
-        return Response({'status': 'membre removed'}, status=status.HTTP_204_NO_CONTENT)
+        if emprunt.membre :
+            emprunt.membre = None
+            emprunt.full_clean()
+            emprunt.save()
+            return Response({'status': 'membre removed'}, status=status.HTTP_204_NO_CONTENT)
+    
+        return Response({'status': 'this emprunt has no membre'}, status=status.HTTP_400_BAD_REQUEST)
     
     @extend_schema(
         description='Method that sets a Livre to an Emprunt',
@@ -106,11 +108,13 @@ class EmpruntViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch', 'put'], url_path='remove-livre/(?P<livre_pk>\d+)')
     def remove_livre(self, request, pk=None, livre_pk=None):
         emprunt = self.get_object()
-        livre = get_object_or_404(Livre, pk=livre_pk)
-        emprunt.livre = None
-        emprunt.full_clean()
-        emprunt.save()
-        return Response({'status': 'livre removed'}, status=status.HTTP_204_NO_CONTENT)
+        if emprunt.livre :
+            emprunt.livre = None
+            emprunt.full_clean()
+            emprunt.save()
+            return Response({'status': 'livre removed'}, status=status.HTTP_204_NO_CONTENT)
+    
+        return Response({'status': 'this emprunt has no livre'}, status=status.HTTP_400_BAD_REQUEST)
     
     
 
@@ -126,9 +130,12 @@ class AvisViewSet(viewsets.ModelViewSet):
     
     queryset = Avis.objects.all()
     serializer_class = AvisSerializer
-    #permission_classes = [IsAdminOrMembre]
-    #pagination_class = EmpruntPagination
-    #ordering_fields = ['user__last_name', 'user__first_name']
+    #permission_classes = [IsAdminOrMembre]   
+    pagination_class = AvisPagination
+    filterset_class = AvisFilterSet
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
+    ordering_fields = ['note', 'livre__titre']
+
 
     @extend_schema(
         description='Method that sets a Membre to an Avis',
@@ -143,7 +150,7 @@ class AvisViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch', 'put'], url_path='set-membre/(?P<membre_pk>\d+)')
     def set_membre(self, request, pk=None, membre_pk=None):
         avis = self.get_object()
-        membre = get_object_or_404(Avis, pk=membre_pk)
+        membre = get_object_or_404(Membre, pk=membre_pk)
         avis.membre = membre
         avis.full_clean()
         avis.save()
@@ -162,11 +169,14 @@ class AvisViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch', 'put'], url_path='remove-membre/(?P<membre_pk>\d+)')
     def remove_membre(self, request, pk=None, membre_pk=None):
         avis = self.get_object()
-        membre = get_object_or_404(Avis, pk=membre_pk)
-        avis.membre = None
-        avis.full_clean()
-        avis.save()
-        return Response({'status': 'membre removed'}, status=status.HTTP_204_NO_CONTENT)
+        if avis.membre :
+            avis.membre = None
+            avis.full_clean()
+            avis.save()
+            return Response({'status': 'livre removed'}, status=status.HTTP_204_NO_CONTENT)
+    
+        return Response({'status': 'this avis has no membre'}, status=status.HTTP_400_BAD_REQUEST)
+    
     
     @extend_schema(
         description='Method that sets a Livre to an Avis',
@@ -178,6 +188,7 @@ class AvisViewSet(viewsets.ModelViewSet):
             ),
         ],
     )
+
     @action(detail=True, methods=['patch', 'put'], url_path='set-livre/(?P<livre_pk>\d+)')
     def set_livre(self, request, pk=None, livre_pk=None):
         avis = self.get_object()
@@ -198,11 +209,14 @@ class AvisViewSet(viewsets.ModelViewSet):
         ],
     )
     @action(detail=True, methods=['patch', 'put'], url_path='remove-livre/(?P<livre_pk>\d+)')
-    def remove_membre(self, request, pk=None, livre_pk=None):
+    def remove_livre(self, request, pk=None, livre_pk=None):
         avis = self.get_object()
-        livre = get_object_or_404(Livre, pk=livre_pk)
-        avis.livre = None
-        avis.full_clean()
-        avis.save()
-        return Response({'status': 'livre removed'}, status=status.HTTP_204_NO_CONTENT)
+        if avis.livre :
+            avis.livre= None
+            avis.full_clean()
+            avis.save()
+            return Response({'status': 'livre removed'}, status=status.HTTP_204_NO_CONTENT)
+    
+        return Response({'status': 'this avis has no livre'}, status=status.HTTP_400_BAD_REQUEST)
+    
 
