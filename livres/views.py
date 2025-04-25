@@ -32,13 +32,10 @@ class LivreViewSet(viewsets.ModelViewSet):
     pagination_class = LivrePagination
     ordering_fields = ['titre', 'date_publication', 'auteur__nom']
 
-    def create(self, request, auteurs_pk=None, categories_pk=None):
+    def create(self, request, categories_pk=None):
         serializer = LivreSerializer(data=request.data)
         if(serializer.is_valid()):
-            if auteurs_pk:
-                auteur = get_object_or_404(Auteur, pk=auteurs_pk)
-                serializer.save(auteur=auteur, createur=request.user)
-            elif categories_pk:
+            if categories_pk:
                 categorie = Categorie.objects.filter(pk=categories_pk)
                 serializer.save(categorie=categorie, createur=request.user)    
             else :
@@ -48,7 +45,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def list(self, request, auteurs_pk=None, categories_pk=None):
+    def list(self, request, categories_pk=None):
         cache_key = 'livres-list-%s-%s' % (auteurs_pk, categories_pk)
         for key, item in request.query_params.items():
             cache_key += "-%s-%s" % (key, item)
@@ -63,9 +60,7 @@ class LivreViewSet(viewsets.ModelViewSet):
             self.paginator.display_page_controls = True
             return self.get_paginated_response(data[1]) 
             
-        if auteurs_pk:
-            livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(auteur=auteurs_pk)))
-        elif categories_pk:
+        if categories_pk:
             livres = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(categorie=categories_pk)))
         else:
             livres = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
@@ -74,7 +69,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
         return self.get_paginated_response(serializer.data)
     
-    def retrieve(self, request, pk, categories_pk=None, auteurs_pk=None):
+    def retrieve(self, request, pk, categories_pk=None):
         
         cache_key = 'livres-%s' % (pk)
         cache_time = 86400 # time in seconds for cache to be valid
@@ -331,12 +326,3 @@ class AuteurViewSet(viewsets.ModelViewSet):
 
         return Response(data, status=status.HTTP_200_OK)
     
-
-"""
-class AvisViewSet(viewsets.ModelVIewSet):
-    pass
-
-class EmpruntViewSet(viewsets.ModelVIewSet):
-    pass
-    
-"""

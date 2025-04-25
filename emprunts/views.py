@@ -32,13 +32,19 @@ class EmpruntViewSet(viewsets.ModelViewSet):
     ordering_fields = ['date_ret', 'retourne', 'date_emp']
 
     def list(self, request, membres_pk=None, livres_pk=None):
+
         if request.user.is_staff:      
-            emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+            if livres_pk:
+                emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(livre=livres_pk)))
+            elif membres_pk:
+                emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=membres_pk)))
+            else:    
+                emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
         else: 
             try:
                 emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=request.user.membre)))
             except:
-                emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=None)))   
+                emprunts = None
 
         serializer = EmpruntSerializer(emprunts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -242,13 +248,18 @@ class AvisViewSet(viewsets.ModelViewSet):
 
     def list(self, request, membres_pk=None, livres_pk=None):
 
-        if request.user.is_staff:      
-            avis = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
-        else: 
-            try:
-                avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=request.user.membre)))
-            except:
-                avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=None)))   
+        if livres_pk:
+            avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(livre=livres_pk)))
+        elif membres_pk:
+            avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=membres_pk)))
+        else:
+            if request.user.is_staff:      
+                avis = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+            else: 
+                try:
+                    avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=request.user.membre)))
+                except:
+                    avis = None
 
         serializer = AvisSerializer(avis, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

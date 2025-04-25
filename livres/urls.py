@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from emprunts.views import EmpruntViewSet, AvisViewSet
 from rest_framework_nested import routers
 
 app_name = 'livres'
@@ -7,8 +8,10 @@ app_name = 'livres'
 livreRouter = routers.DefaultRouter()
 livreRouter.register(r'livres', views.LivreViewSet,basename='livres')
 domains_router = routers.NestedSimpleRouter(livreRouter, r'livres', lookup='livres')
-domains_router.register(r'auteurs', views.AuteurViewSet, basename='livres-auteurs')
 domains_router.register(r'categories', views.CategorieViewSet, basename='livres-categories')
+domains_router.register(r'avis', AvisViewSet, basename='livres-avis')
+domains_router.register(r'emprunts', EmpruntViewSet, basename='livres-emprunts')
+
 
 auteurRouter = routers.DefaultRouter()
 auteurRouter.register(r'auteurs', views.AuteurViewSet, basename='auteur')
