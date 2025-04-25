@@ -77,6 +77,12 @@ def _handle_permissions_error(exc, context, response):
             elif request.method  in ['DELETE', 'PUT', 'PATCH']:
                 response.data['detail'] = 'This Avis doesn\'t belong to you, you can\'t edit or delete it'
 
+        elif view.__class__.__name__ == 'MembreViewSet':
+            if request.method in permissions.SAFE_METHODS:
+                response.data['detail'] = 'You have to be an admin to access this page.'
+            else:
+                response.data['detail'] = 'You have to be an admin to proceed'    
+            
     return response
 
 def _handle_not_allowed_error(exc, context, response):

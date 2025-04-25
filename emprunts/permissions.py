@@ -36,5 +36,12 @@ class IsAdminOrAvisBelongsToMember(permissions.BasePermission):
                 return obj.membre.user.id == request.user.id  
         
         return True
+
+class IsAdminOrOwnerToReadMemberInfo(permissions.BasePermission):
     
-    
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_staff:
+            return True
+        
+        return obj.user_id == request.user.id
+        

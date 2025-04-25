@@ -130,7 +130,9 @@ class MembreViewSet(viewsets.ModelViewSet):
     """
     queryset = Membre.objects.all()
     serializer_class = MembreSerializer
-    #permission_classes = [IsAdminOrMembre]
+    permission_classes = [
+        permissions.IsAdminUser,
+    ]
     pagination_class = MembrePagination
     filterset_class = MembreFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
