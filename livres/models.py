@@ -48,10 +48,12 @@ class Livre(models.Model):
 
     def clean(self):
         errors = {}
+        """
+        ne marche pas
         double = Livre.objects.filter(titre=self.titre, auteur=self.auteur)
         if double:
             errors['titre'] = ValidationError(_("This author already used this title."))
-
+        """
         if errors:
             raise ValidationError(errors)
     

@@ -16,6 +16,7 @@ from api.pagination import *
 from .serializers import * 
 from .models import *
 from .filters import *
+from emprunts.models import Emprunt
 
 # Create your views here.
 
@@ -122,6 +123,49 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.save()
         return Response({'status': 'auteur removed'}, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        description='Method that sets an Emprunt to a Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/set-emprunt/1/',
+                value="{'status': 'emprunt added'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='set-emprunt/(?P<emprunt_pk>\d+)')
+    def set_emprunt(self, request, pk=None, emprunt_pk=None):
+        livre = self.get_object()
+        emprunt = get_object_or_404(Emprunt, pk=emprunt_pk)
+        if not emprunt.retourne:
+            already_booked = Emprunt.objects.filter(retourne=None, livre=livre)
+            if already_booked:
+                return Response({'status': 'this book is not available'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        livre.emprunt_set.add(emprunt)
+        livre.full_clean()
+        livre.save()
+        return Response({'status': 'emprunt added'}, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+        description='Method that removes an Emprunt from a Livre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /livres/1/remove-emprunt/1/',
+                value="{'status': 'emprunt removed'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='remove-emprunt/(?P<emprunt_pk>\d+)')
+    def remove_emprunt(self, request, pk=None, emprunt_pk=None):
+        livre = self.get_object()
+        emprunt = get_object_or_404(Emprunt, pk=emprunt_pk)
+        livre.emprunt_set.remove(emprunt)
+        livre.full_clean()
+        livre.save()
+        return Response({'status': 'emprunt removed'}, status=status.HTTP_200_OK)
+    
    
     @extend_schema(
         description='Method that adds a Categorie to a Livre',
