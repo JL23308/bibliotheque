@@ -9,7 +9,7 @@ from rest_framework.validators import UniqueTogetherValidator
 class LivreItemSerializer(serializers.Serializer):
     """
         Serializer that transforms a Livre into a JSON response
-        Livre (object) => JSON, form
+        Livre (object) => JSON
     """
     pk = serializers.IntegerField(read_only=True)
     titre = serializers.CharField(read_only=True)
@@ -19,7 +19,7 @@ class LivreItemSerializer(serializers.Serializer):
 class AuteurItemSerializer(serializers.Serializer):
     """
         Serializer that transforms an Auteur into a JSON response
-        Auteur (object) => JSON, form
+        Auteur (object) => JSON
     """
     pk = serializers.IntegerField(read_only=True)
     prenom = serializers.CharField(read_only=True)
@@ -29,7 +29,7 @@ class AuteurItemSerializer(serializers.Serializer):
 class CategorieItemSerializer(serializers.Serializer):
     """
         Serializer that transforms a Categorie into a JSON response
-        Categorie (object) => JSON, form
+        Categorie (object) => JSON
     """
     pk = serializers.IntegerField(read_only=True)
     nom = serializers.CharField(read_only=True)
@@ -38,12 +38,13 @@ class CategorieItemSerializer(serializers.Serializer):
 class UserItemSerializer(serializers.Serializer):
     """
         Serializer that transforms an User into a JSON response
-        User (object) => JSON, form
+        User (object) => JSON
     """
     pk = serializers.IntegerField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True)
+
 
 
 #============================================
@@ -118,5 +119,6 @@ class LivreSerializer(serializers.ModelSerializer):
             if value > date.today():
                 raise serializers.ValidationError(_(str(value) + " is in the future."))
         return value
-    
+
+   
     
