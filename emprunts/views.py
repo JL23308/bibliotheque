@@ -175,12 +175,53 @@ class MembreViewSet(viewsets.ModelViewSet):
     def remove_membre(self, request, pk=None, emprunt_pk=None):
         membre = self.get_object()
         emprunt = get_object_or_404(Emprunt, pk=emprunt_pk)
-        membre.emprunt_set.remove(emprunt)
+        membre.emprunt_set.remove(emprunt) 
         membre.full_clean()
         membre.save()
         return Response({'status': 'membre removed'}, status=status.HTTP_204_NO_CONTENT)
-  
+    
+    @extend_schema(
+        description='Method that adds an Avis to a Membre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /membres/1/add-avis/1/',
+                value="{'status': 'avis added'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='add-avis/(?P<avis_pk>\d+)')
+    def set_avis(self, request, pk=None, avis_pk=None):
+        membre = self.get_object()
+        avis = get_object_or_404(Avis, pk=avis_pk)
 
+        if avis.membre:
+            return Response({'status': 'this Avis is already related to a Membre'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        membre.avis_set.add(avis)
+        membre.full_clean()
+        membre.save()
+        return Response({'status': 'avis added'}, status=status.HTTP_204_NO_CONTENT)
+    
+    @extend_schema(
+        description='Method that remove an Avis from a Membre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /membres/1/remove-avis/1/',
+                value="{'status': 'avis removed'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='remove-avis/(?P<avis_pk>\d+)')
+    def remove_avis(self, request, pk=None, avis_pk=None):
+        membre = self.get_object()
+        avis = get_object_or_404(Avis, pk=avis_pk)
+        membre.avis_set.remove(avis)
+        membre.full_clean()
+        membre.save()
+        return Response({'status': 'avis removed'}, status=status.HTTP_204_NO_CONTENT)
+  
 
 class AvisViewSet(viewsets.ModelViewSet):
     """
