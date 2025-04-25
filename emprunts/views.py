@@ -155,7 +155,7 @@ class AvisViewSet(viewsets.ModelViewSet):
             except:
                 avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=None)))   
 
-        serializer = EmpruntSerializer(avis, many=True)
+        serializer = AvisSerializer(avis, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
