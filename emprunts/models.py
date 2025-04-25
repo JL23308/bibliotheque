@@ -11,7 +11,7 @@ class Membre(models.Model):
 class Avis(models.Model):
     membre = models.ForeignKey(Membre, on_delete=models.CASCADE, blank=True, null=True)
     livre = models.ForeignKey(Livre, on_delete=models.CASCADE, blank=True, null=True)
-    note = models.IntegerField(blank=True, null=True)
+    note = models.PositiveIntegerField(blank=True, null=True)
     commentaire = models.CharField(max_length=5000, blank=True, null=True)
 
 class Emprunt(models.Model):

@@ -116,7 +116,6 @@ class EmpruntViewSet(viewsets.ModelViewSet):
     
         return Response({'status': 'this emprunt has no livre'}, status=status.HTTP_400_BAD_REQUEST)
     
-    
 
 class MembreViewSet(viewsets.ModelViewSet):
     
