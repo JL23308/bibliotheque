@@ -6,16 +6,32 @@ class IsAdminOrMembre(permissions.BasePermission):
         if request.user.is_staff:
             return True
         
-        if request.method in permissions.SAFE_METHODS:
-            if obj.membre:
+        if view.__class__.__name__ == 'EmpruntViewSet':
+            if request.method in permissions.SAFE_METHODS:
+                if obj.membre:
+                    return obj.membre.user.id == request.user.id  
+                
+            if request.method == 'delete':
                 return obj.membre.user.id == request.user.id  
-
-        if request.method == 'delete':
-            return obj.membre.user.id == request.user.id  
+        """
+        if view.__class__.__name__ == 'AvisViewSet':
+            if request.method in permissions.SAFE_METHODS:
+                return True
+            return obj.membre.user.id == request.user.id
+        """
 
         return False
     
     def has_permission(self, request, view):
-        return True
-        dd(request)
+        if request.user.is_staff:
+            return True
+    
+        if view.__class__.__name__ == 'EmpruntViewSet':
+            if request.method in permissions.SAFE_METHODS:
+                return True
+            
+            if request.method == 'post':
+                return request.user.membre
+
+        return False
    
