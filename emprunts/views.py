@@ -138,6 +138,49 @@ class MembreViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     ordering_fields = ['user__first_name', 'user__last_name']
 
+    @extend_schema(
+        description='Method that adds an Emprunt to a Membre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /membres/1/add-emprunt/1/',
+                value="{'status': 'emprunt added'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='add-emprunt/(?P<emprunt_pk>\d+)')
+    def set_membre(self, request, pk=None, emprunt_pk=None):
+        membre = self.get_object()
+        emprunt = get_object_or_404(Emprunt, pk=emprunt_pk)
+
+        if emprunt.membre:
+            return Response({'status': 'this emprunt is already related to a Membre'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        membre.emprunt_set.add(emprunt)
+        membre.full_clean()
+        membre.save()
+        return Response({'status': 'membre added'}, status=status.HTTP_204_NO_CONTENT)
+    
+    @extend_schema(
+        description='Method that remove an Emprunt from a Membre',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /membres/1/remove-emprunt/1/',
+                value="{'status': 'emprunt removed'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='remove-emprunt/(?P<emprunt_pk>\d+)')
+    def remove_membre(self, request, pk=None, emprunt_pk=None):
+        membre = self.get_object()
+        emprunt = get_object_or_404(Emprunt, pk=emprunt_pk)
+        membre.emprunt_set.remove(emprunt)
+        membre.full_clean()
+        membre.save()
+        return Response({'status': 'membre removed'}, status=status.HTTP_204_NO_CONTENT)
+  
+
 
 class AvisViewSet(viewsets.ModelViewSet):
     """
