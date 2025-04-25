@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from django.contrib.auth.models import AnonymousUser
 
 class IsAdminOrMembre(permissions.BasePermission):
     
@@ -27,9 +28,9 @@ class IsAdminOrMembre(permissions.BasePermission):
             return True
     
         if view.__class__.__name__ == 'EmpruntViewSet':
-            if request.method in permissions.SAFE_METHODS:
+            if request.method in permissions.SAFE_METHODS and type(request.user) != AnonymousUser:
                 return True
-            
+                
             if request.method == 'post':
                 return request.user.membre
 
