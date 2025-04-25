@@ -15,8 +15,8 @@ class Avis(models.Model):
     commentaire = models.CharField(max_length=5000, blank=True, null=True)
 
 class Emprunt(models.Model):
-    membre = models.ForeignKey(Membre, on_delete=models.CASCADE)
-    livre = models.ForeignKey(Livre, on_delete=models.CASCADE)
-    date_emp = models.DateField()
-    date_ret = models.DateField()
+    membre = models.ForeignKey(Membre, on_delete=models.CASCADE, blank=True, null=True)
+    livre = models.ForeignKey(Livre, on_delete=models.CASCADE, blank=True, null=True)
+    date_emp = models.DateField(blank=True, null=True, max_length=10)
+    date_ret = models.DateField(blank=True, null=True, max_length=10)
     retourne = models.DateField(blank=True, null=True)

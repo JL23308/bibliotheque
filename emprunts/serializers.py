@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
 from .models import *
-from livres.serializers import LivreItemSerializer
+from livres.serializers import LivreItemSerializer, UserItemSerializer
 
 class MembreItemSerializer(serializers.Serializer):
     """
         Serializer that transforms a Membre into a JSON response
         Membre (object) => JSON
     """
+    user = UserItemSerializer(read_only=True)
     adresse = serializers.CharField(read_only=True)
     telephone = serializers.CharField(read_only=True)
     
@@ -28,12 +29,13 @@ class EmpruntItemSerializer(serializers.Serializer):
     date_ret = serializers.DateField(read_only=True)
     retourne = serializers.DateField(read_only=True)
 
-class EmpruntSerializer(serializers.Serializer):
+class EmpruntSerializer(serializers.ModelSerializer):
     membre = MembreItemSerializer(read_only=True)
     livre = LivreItemSerializer(read_only=True)
     class Meta:
-        model = Membre
+        model = Emprunt
         fields = [
+            'pk',
             'date_emp',
             'date_ret',
             'retourne',
@@ -42,12 +44,13 @@ class EmpruntSerializer(serializers.Serializer):
         ]
 
 
-class MembreSerializer(serializers.Serializer):
-    avis = AvisItemSerializer(read_only=True)
-    emprunt = EmpruntItemSerializer(read_only=True)
+class MembreSerializer(serializers.ModelSerializer):
+    avis = AvisItemSerializer(read_only=True, many=True)
+    emprunt = EmpruntItemSerializer(read_only=True, many=True)
     class Meta:
         model = Membre
         fields = [
+            'pk',
             'user',
             'adresse',
             'telephone',
@@ -55,12 +58,13 @@ class MembreSerializer(serializers.Serializer):
             'emprunt'
         ]
 
-class AvisSerializer(serializers.Serializer):
+class AvisSerializer(serializers.ModelSerializer):
     membre = MembreItemSerializer(read_only=True)
     livre = LivreItemSerializer(read_only=True)
     class Meta:
         model = Avis
         fields = [
+            'pk',
             'note',
             'commentaire',
             'membre',

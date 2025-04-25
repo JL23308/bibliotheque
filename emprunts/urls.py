@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from livres.views import LivreViewSet
 from rest_framework_nested import routers
 
 app_name = 'livres'

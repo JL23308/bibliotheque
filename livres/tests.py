@@ -347,12 +347,15 @@ class LivreApiTestCase(APITestCase):
 
 
     def test_get_list_unauthenticated(self):
+        cache.clear()
         url = reverse('livres:livres-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 4)
+        cache.clear()
 
     def test_get_livre_unauthenticated(self):
+        cache.clear()
         url = reverse('livres:livres-detail', kwargs={'pk':1})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -360,8 +363,12 @@ class LivreApiTestCase(APITestCase):
         self.assertEqual(response.data['date_publication'], "2025-04-01")
         self.assertEqual(response.data['isbn'], "1234567890098")
         self.assertEqual(response.data['auteur']['pk'], self.auteurs[0].pk)
+
+        cache.clear()
     
     def authenticate(self):
+
+        cache.clear()
         url = reverse('token-auth')
         user_data = {
             'username': 'admin',
@@ -369,8 +376,10 @@ class LivreApiTestCase(APITestCase):
         }
         token = self.client.post(url, user_data)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.data['token'])
+        cache.clear()
 
-    def test_create_livre(self):   
+    def test_create_livre(self):  
+        cache.clear()         
         self.authenticate()
         url = reverse('livres:livres-list')
         livre_data = {
@@ -384,9 +393,11 @@ class LivreApiTestCase(APITestCase):
         self.assertEqual(response.data['titre'], 'new livre')
         self.assertEqual(response.data['date_publication'], '2025-01-01')
         self.assertEqual(response.data['isbn'], '7876789098765')
+        cache.clear()
       
         
     def test_edit_livre(self):
+        cache.clear()
         self.authenticate()
         url = reverse('livres:livres-detail', kwargs={'pk': 1})
         livre_data = {
@@ -409,15 +420,19 @@ class LivreApiTestCase(APITestCase):
         self.assertEqual(response.data['titre'], 'new livre 2')
         self.assertIsNone(response.data['date_publication'])
         self.assertEqual(response.data['isbn'], '2283729837297')
+        cache.clear()
         
 
     def test_delete_livre(self):
+        cache.clear()
         self.authenticate()
         url = reverse('livres:livres-detail', kwargs={'pk': 1})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
+        cache.clear()
         
     def test_filter(self):
+        cache.clear()
         url = reverse('livres:livres-list', query={'titre': '1'})
         response = self.client.get(url)
         self.assertEqual(len(response.data['results']), 1)
@@ -470,6 +485,7 @@ class LivreApiTestCase(APITestCase):
             })
         response = self.client.get(url)
         self.assertEqual(response.data['results'][0]['date_publication'], '2025-07-21')
+        cache.clear()
 
 
     def test_pagination(self):
@@ -485,9 +501,10 @@ class LivreApiTestCase(APITestCase):
         url = reverse('livres:livres-list', query={'page': '2'})
         response = self.client.get(url)
         self.assertEqual(len(response.data['results']), 1)
-
+        cache.clear()
     
     def test_permissions(self):
+        cache.clear()
         url = reverse('livres:livres-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -563,9 +580,11 @@ class LivreApiTestCase(APITestCase):
         url = reverse('livres:livres-detail', kwargs={'pk': 2})
         response = self.client.put(url)
         self.assertEqual(response.status_code, 403)
+        cache.clear()
 
 
     def test_create_api_key(self):
+        cache.clear()
         
         url = reverse('token-auth')
         user_data = {
@@ -575,8 +594,10 @@ class LivreApiTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['token'], str(Token.objects.get(user=self.admin_user)))
+        cache.clear()
 
     def test_authenticate(self):
+        cache.clear()
         self.test_create_api_key()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + str(Token.objects.get(user=self.admin_user)))
         
@@ -588,4 +609,5 @@ class LivreApiTestCase(APITestCase):
         url = reverse('livres:livres-list')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 201)
+        cache.clear()
         

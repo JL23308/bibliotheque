@@ -10,16 +10,22 @@ from .models import *
 from .serializers import *
 from .permissions import *
 from api.pagination import *
+from .filters import *
 
 # Create your views here.
 
 class EmpruntViewSet(viewsets.ModelViewSet):
-    
+    """
+        ViewSet that manages Emprunt with CRUD methods
+    """
+
     queryset = Emprunt.objects.all()
     serializer_class = EmpruntSerializer
     permission_classes = [IsAdminOrMembre]
     pagination_class = EmpruntPagination
-    #ordering_fields = ['user__last_name', 'user__first_name']
+    filterset_class = EmpruntFilterSet
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
+    ordering_fields = ['date_ret', 'retourne', 'date_emp']
 
     @extend_schema(
         description='Method that sets a Membre to an Emprunt',
@@ -38,7 +44,26 @@ class EmpruntViewSet(viewsets.ModelViewSet):
         emprunt.membre = membre
         emprunt.full_clean()
         emprunt.save()
-        return Response({'status': 'membre added'}, status=status.HTTP_200_OK)
+        return Response({'status': 'membre added'}, status=status.HTTP_204_NO_CONTENT)
+    
+    @extend_schema(
+        description='Method that removes a Membre from an Emprunt',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /emprunts/1/remove-membre/1/',
+                value="{'status': 'membre removed'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='remove-membre/(?P<membre_pk>\d+)')
+    def remove_membre(self, request, pk=None, membre_pk=None):
+        emprunt = self.get_object()
+        membre = get_object_or_404(Membre, pk=membre_pk)
+        emprunt.membre = None
+        emprunt.full_clean()
+        emprunt.save()
+        return Response({'status': 'membre removed'}, status=status.HTTP_204_NO_CONTENT)
     
     @extend_schema(
         description='Method that sets a Livre to an Emprunt',
@@ -50,14 +75,34 @@ class EmpruntViewSet(viewsets.ModelViewSet):
             ),
         ],
     )
-    @action(detail=True, methods=['patch', 'put'], url_path='set-livre/(?P<membre_pk>\d+)')
+    @action(detail=True, methods=['patch', 'put'], url_path='set-livre/(?P<livre_pk>\d+)')
     def set_livre(self, request, pk=None, livre_pk=None):
         emprunt = self.get_object()
         livre = get_object_or_404(Livre, pk=livre_pk)
         emprunt.livre = livre
         emprunt.full_clean()
         emprunt.save()
-        return Response({'status': 'livre added'}, status=status.HTTP_200_OK)
+        return Response({'status': 'livre added'}, status=status.HTTP_204_NO_CONTENT)
+    
+    @extend_schema(
+        description='Method that removes a Livre from an Emprunt',
+        examples=[
+            OpenApiExample(
+                'Example 1',
+                description='method put on /emprunts/1/remove-livre/1/',
+                value="{'status': 'livre removed'}"
+            ),
+        ],
+    )
+    @action(detail=True, methods=['patch', 'put'], url_path='remove-livre/(?P<livre_pk>\d+)')
+    def remove_livre(self, request, pk=None, livre_pk=None):
+        emprunt = self.get_object()
+        livre = get_object_or_404(Livre, pk=livre_pk)
+        emprunt.livre = None
+        emprunt.full_clean()
+        emprunt.save()
+        return Response({'status': 'livre removed'}, status=status.HTTP_204_NO_CONTENT)
+    
     
 
 class MembreViewSet(viewsets.ModelViewSet):
