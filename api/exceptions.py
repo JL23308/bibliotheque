@@ -52,7 +52,6 @@ def _handle_integrity_error(exc, context, response):
 
 def _handle_permissions_error(exc, context, response):
     request = context['request']
-    method = request.method.lower()
     view = context['view']
     if response: 
         
@@ -62,23 +61,21 @@ def _handle_permissions_error(exc, context, response):
         }
 
         if view.__class__.__name__ == 'EmpruntViewSet':
-
-            if method == 'post':
+            if request.method == 'POST':
                 response.data['detail'] = 'You have to be a member to book a book'
             
-            elif method in ['put', 'patch']:
+            elif request.method in ['PUT', 'PATCH']:
                 response.data['detail'] = 'You can\'t edit an Emprunt unless you\'re an admin'
             
-            elif method == 'delete' or method in permissions.SAFE_METHODS:
+            elif request.method  == 'DELETE' or request.method in permissions.SAFE_METHODS:
                 response.data['detail'] = 'This Emprunt doesn\'t belong to you.'
     
         elif view.__class__.__name__ == 'AvisViewSet':
-
-            if method == 'post':
+            if request.method  == 'POST':
                 response.data['detail'] = 'You have to be a member to share your opinion'
             
-            elif method in ['delete', 'put', 'patch']:
-                response.data['detail'] = 'This Emprunt doesn\'t belong to you, you can\'t delete it'
+            elif request.method  in ['DELETE', 'PUT', 'PATCH']:
+                response.data['detail'] = 'This Avis doesn\'t belong to you, you can\'t edit or delete it'
 
     return response
 

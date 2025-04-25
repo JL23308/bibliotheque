@@ -21,7 +21,11 @@ class EmpruntViewSet(viewsets.ModelViewSet):
 
     queryset = Emprunt.objects.all()
     serializer_class = EmpruntSerializer
-    permission_classes = [IsAdminOrMembre, permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [
+        IsAdminOrMembreToBookOrShareOpinion,
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAdminOrEmpruntBelongsToMember,    
+    ]
     pagination_class = EmpruntPagination
     filterset_class = EmpruntFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
@@ -31,8 +35,11 @@ class EmpruntViewSet(viewsets.ModelViewSet):
         if request.user.is_staff:      
             emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
         else: 
-            emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=request.user.membre)))
-        
+            try:
+                emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=request.user.membre)))
+            except:
+                emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=None)))   
+                 
         serializer = EmpruntSerializer(emprunts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -129,7 +136,11 @@ class AvisViewSet(viewsets.ModelViewSet):
     
     queryset = Avis.objects.all()
     serializer_class = AvisSerializer
-    permission_classes = [IsAdminOrMembre, permissions.IsAuthenticatedOrReadOnly]   
+    permission_classes = [
+        IsAdminOrMembreToBookOrShareOpinion, 
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAdminOrAvisBelongsToMember,
+    ]   
     pagination_class = AvisPagination
     filterset_class = AvisFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
