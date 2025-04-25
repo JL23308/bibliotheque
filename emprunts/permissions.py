@@ -37,3 +37,4 @@ class IsAdminOrAvisBelongsToMember(permissions.BasePermission):
         
         return True
     
+    

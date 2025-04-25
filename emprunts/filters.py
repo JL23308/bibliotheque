@@ -33,5 +33,15 @@ class AvisFilterSet(django_filters.FilterSet):
             'membre'
         ]
         
-
+class MembreFilterSet(django_filters.FilterSet):
+    adresse = django_filters.CharFilter(lookup_expr='icontains', field_name='adresse')
+    
+    class Meta:
+        model = Membre
+        fields = [
+            'user__first_name',
+            'user__last_name',
+            'adresse',
+            'telephone',
+        ]
     

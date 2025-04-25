@@ -45,8 +45,9 @@ class EmpruntSerializer(serializers.ModelSerializer):
 
 
 class MembreSerializer(serializers.ModelSerializer):
-    avis = AvisItemSerializer(read_only=True, many=True)
-    emprunt = EmpruntItemSerializer(read_only=True, many=True)
+    user = UserItemSerializer(read_only=True)
+    avis_set = AvisItemSerializer(read_only=True, many=True)
+    emprunt_set = EmpruntItemSerializer(read_only=True, many=True)
     class Meta:
         model = Membre
         fields = [
@@ -54,8 +55,8 @@ class MembreSerializer(serializers.ModelSerializer):
             'user',
             'adresse',
             'telephone',
-            'avis',
-            'emprunt'
+            'avis_set',
+            'emprunt_set',
         ]
 
 class AvisSerializer(serializers.ModelSerializer):

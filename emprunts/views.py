@@ -31,7 +31,7 @@ class EmpruntViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     ordering_fields = ['date_ret', 'retourne', 'date_emp']
 
-    def list(self, request, membres_pk=None):
+    def list(self, request, membres_pk=None, livres_pk=None):
         if request.user.is_staff:      
             emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
         else: 
@@ -125,14 +125,22 @@ class EmpruntViewSet(viewsets.ModelViewSet):
     
 
 class MembreViewSet(viewsets.ModelViewSet):
-    
+    """
+        ViewSet that manages Membres with CRUD methods
+    """
     queryset = Membre.objects.all()
     serializer_class = MembreSerializer
     #permission_classes = [IsAdminOrMembre]
-    #pagination_class = EmpruntPagination
-    #ordering_fields = ['user__last_name', 'user__first_name']
+    pagination_class = MembrePagination
+    filterset_class = MembreFilterSet
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
+    ordering_fields = ['user__first_name', 'user__last_name']
+
 
 class AvisViewSet(viewsets.ModelViewSet):
+    """
+        ViewSet that manages Avis with CRUD methods
+    """
     
     queryset = Avis.objects.all()
     serializer_class = AvisSerializer
@@ -146,8 +154,9 @@ class AvisViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     ordering_fields = ['note', 'livre__titre']
 
-    def list(self, request, membres_pk=None):
-        if request.user.is_staff or membres_pk:      
+    def list(self, request, membres_pk=None, livres_pk=None):
+
+        if request.user.is_staff:      
             avis = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
         else: 
             try:
