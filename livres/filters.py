@@ -16,5 +16,20 @@ class LivreFilterSet(django_filters.FilterSet):
             'categorie__nom',
             ]
         
+class CategorieFilterSet(django_filters.FilterSet):
+    class Meta:
+        model = Categorie
+        fields = ['nom']
+        
+class AuteurFilterSet(django_filters.FilterSet):
+    date_naissance = django_filters.DateFromToRangeFilter(widget=RangeWidget(attrs={'type': 'date'}))
+
+    class Meta:
+        model = Auteur
+        fields = [
+            'nom', 
+            'prenom',
+            ]
+        
 
     

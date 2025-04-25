@@ -46,7 +46,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def list(self, request, categories_pk=None):
-        cache_key = 'livres-list-%s-%s' % (auteurs_pk, categories_pk)
+        cache_key = 'livres-list-%s' % (categories_pk)
         for key, item in request.query_params.items():
             cache_key += "-%s-%s" % (key, item)
         
@@ -84,26 +84,6 @@ class LivreViewSet(viewsets.ModelViewSet):
 
         return Response(data, status=status.HTTP_200_OK)
 
-    """
-        Method that sets an Auteur to a Livre
-
-        param:
-            parameters are set in the url (example)
-            - int pk, id of the Livre
-            - int auteurs_pk, id of the Auteur
-        return: 
-            JSON response that contains a message that confirms the Auteur was set 
-            or 404 error if the Auteur was not found
-
-        example: 
-            auteur1 = Auteur.objects.create(nom=SITHI, prenom='JL', date_naissance='2025-07-21')
-            livre1 = Livre.objects.create(titre='titre1', date_publication='2025-01-01', isbn='6756786273879')
-            auteur1.save()
-            livre1.save()
-
-            put /livres/1/set-auteur/1/
-            response : {'status': 'auteur added'}
-    """
     @extend_schema(
         description='Method that sets an Auteur to a Livre',
         examples=[
@@ -123,28 +103,6 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.save()
         return Response({'status': 'auteur added'}, status=status.HTTP_200_OK)
     
-
-    """
-        Method that removes an Auteur from Livre
-
-        param:
-            parameters are set in the url (example)
-            - int pk, id of the Livre
-            - int auteurs_pk, id of the Auteur
-        return: 
-            JSON response that contains a message that confirms the Auteur was removed 
-            or 404 error if the Auteur was not found
-
-        example: 
-            auteur1 = Auteur.objects.create(nom=SITHI, prenom='JL', date_naissance='2025-07-21')
-            livre1 = Livre.objects.create(titre='titre1', date_publication='2025-01-01', isbn='6756786273879', auteur=auteur1)
-            auteur1.save()
-            livre1.save()
-
-            put /livres/1/remove-auteur/1/
-            response : {'status': 'auteur removed'}
-    """
-
     @extend_schema(
         description='Method that removes an Auteur from Livre',
         examples=[
@@ -164,27 +122,7 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.save()
         return Response({'status': 'auteur removed'}, status=status.HTTP_200_OK)
 
-    """
-        Method that adds a Categorie to a Livre
-
-        param:
-            parameters are set in the url (example)
-            - int pk, id of the Livre
-            - int categories_pk, id of the Auteur
-        return: 
-            JSON response that contains a message that confirms the Categorie was added 
-            or 404 error if the Categorie was not found
-
-        example: 
-            categorie1 = Categorie.objects.create(nom='horreur', description='fait peur')
-            livre1 = Livre.objects.create(titre='titre1', date_publication='2025-01-01', isbn='6756786273879')
-            categorie1.save()
-            livre1.save()
-
-            put /livres/1/add-categorie/1/
-            response : {'status': 'categorie added'}
-    """
-
+   
     @extend_schema(
         description='Method that adds a Categorie to a Livre',
         examples=[
@@ -202,27 +140,6 @@ class LivreViewSet(viewsets.ModelViewSet):
         livre.categorie.add(categorie)
         return Response({'status': 'categorie added'}, status=status.HTTP_200_OK)
     
-    """
-        Method that removes a Categorie of a Livre
-
-        param:
-            parameters are set in the url (example)
-            - int pk, id of the Livre
-            - int categories_pk, id of the Auteur
-        return: 
-            JSON response that contains a message that confirms the Categorie was removed 
-            or 404 error if the Categorie was not found
-
-        example: 
-            categorie1 = Categorie.objects.create(nom='horreur', description='fait peur')
-            livre1 = Livre.objects.create(titre='titre1', date_publication='2025-01-01', isbn='6756786273879')
-            livre1.categorie.add(categorie)
-            categorie1.save()
-            livre1.save()
-
-            put /livres/1/remove-categorie/1/
-            response : {'status': 'categorie removed'}
-    """
     @extend_schema(
         description='Method that removes a Categorie from a Livre',
         examples=[
@@ -249,26 +166,35 @@ class CategorieViewSet(viewsets.ModelViewSet):
     """
     queryset = Categorie.objects.all()
     serializer_class = CategorieSerializer
+    permission_classes = [permissions.IsAdminUser]
+    filterset_class = CategorieFilterSet
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
+    pagination_class = CategoriePagination
+    ordering_fields = ['livre__titre', 'livre__date_publication', 'date_naissance']
+
 
     def list(self, request, livres_pk=None):
         cache_key = 'categories-list-%s' % (livres_pk)    
+        for key, item in request.query_params.items():
+            cache_key += "-%s-%s" % (key, item)
         cache_time = 86400 # time in seconds for cache to be valid
         data = cache.get(cache_key) # returns None if no key-value pair    
 
-        if not data: 
+        if data:
+            self.paginator.page = data[0]
+            self.paginator.request = request
+            self.paginator.display_page_controls = True
+            return self.get_paginated_response(data[1]) 
         
-            if livres_pk:
-                #categories = self.queryset.filter(livre=livres_pk)
-                categories = Livre.objects.prefetch_related("categorie").get(pk=livres_pk).categorie.all()
-            else:
-                categories = self.queryset
-            
-            serializer = CategorieSerializer(categories, many=True)
-            data=serializer.data
-            cache.set(cache_key, data, cache_time)
+        if livres_pk:
+            #categories = self.queryset.filter(livre=livres_pk)
+            categories = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(livre=livres_pk)))
+        else:
+            categories = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
         
-        return Response(data, status=status.HTTP_200_OK)
-
+        serializer = self.get_serializer(categories, many=True)
+        cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
+        return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk, livres_pk=None):
         
@@ -291,24 +217,31 @@ class AuteurViewSet(viewsets.ModelViewSet):
     """
     queryset = Auteur.objects.all()
     serializer_class = AuteurSerializer
+    permission_classes = [permissions.IsAdminUser]
+    filterset_class = AuteurFilterSet
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
+    pagination_class = AuteurPagination
+    ordering_fields = ['nom', 'prenom', 'date_naissance']
 
-    def list(self, request, livres_pk=None):
-        
-        cache_key = 'auteurs-list-%s' % (livres_pk)    
+    def list(self, request):  
+        cache_key = 'auteurs-list'    
+        for key, item in request.query_params.items():
+            cache_key += "-%s-%s" % (key, item)
         cache_time = 86400 # time in seconds for cache to be valid
         data = cache.get(cache_key) # returns None if no key-value pair    
+
+        if data:
+            self.paginator.page = data[0]
+            self.paginator.request = request
+            self.paginator.display_page_controls = True
+            return self.get_paginated_response(data[1]) 
         
-        if not data: 
-            if livres_pk:
-                auteur = self.queryset.filter(livre=livres_pk)
-            else:
-                auteur = self.queryset
-            
-            serializer = AuteurSerializer(auteur, many=True)
-            data=serializer.data
-            cache.set(cache_key, data, cache_time)
-            
-        return Response(data, status=status.HTTP_200_OK)
+        categories = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+        
+        serializer = self.get_serializer(categories, many=True)
+        cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
+        return self.get_paginated_response(serializer.data)
+
 
 
     def retrieve(self, request, pk, livres_pk=None):
