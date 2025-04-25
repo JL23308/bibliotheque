@@ -185,7 +185,7 @@ class MembreViewSet(viewsets.ModelViewSet):
         ],
     )
     @action(detail=True, methods=['patch', 'put'], url_path='add-emprunt/(?P<emprunt_pk>\d+)')
-    def set_membre(self, request, pk=None, emprunt_pk=None):
+    def set_emprunt(self, request, pk=None, emprunt_pk=None):
         membre = self.get_object()
         emprunt = get_object_or_404(Emprunt, pk=emprunt_pk)
 
@@ -208,7 +208,7 @@ class MembreViewSet(viewsets.ModelViewSet):
         ],
     )
     @action(detail=True, methods=['patch', 'put'], url_path='remove-emprunt/(?P<emprunt_pk>\d+)')
-    def remove_membre(self, request, pk=None, emprunt_pk=None):
+    def remove_emprunt(self, request, pk=None, emprunt_pk=None):
         membre = self.get_object()
         emprunt = get_object_or_404(Emprunt, pk=emprunt_pk)
         membre.emprunt_set.remove(emprunt) 
