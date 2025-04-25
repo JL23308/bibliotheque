@@ -39,7 +39,7 @@ class EmpruntViewSet(viewsets.ModelViewSet):
                 emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=request.user.membre)))
             except:
                 emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=None)))   
-                 
+
         serializer = EmpruntSerializer(emprunts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -145,6 +145,18 @@ class AvisViewSet(viewsets.ModelViewSet):
     filterset_class = AvisFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     ordering_fields = ['note', 'livre__titre']
+
+    def list(self, request, membres_pk=None):
+        if request.user.is_staff or membres_pk:      
+            avis = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+        else: 
+            try:
+                avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=request.user.membre)))
+            except:
+                avis = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(membre=None)))   
+
+        serializer = EmpruntSerializer(avis, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
     @extend_schema(
