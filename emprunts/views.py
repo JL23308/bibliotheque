@@ -1,4 +1,5 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render, get_object_or_404
+from django.core.cache import cache
 from rest_framework import filters, viewsets, status, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
@@ -33,6 +34,20 @@ class EmpruntViewSet(viewsets.ModelViewSet):
 
     def list(self, request, membres_pk=None, livres_pk=None):
 
+        cache_key = 'emprunts-list-%s-%s' % (membres_pk, livres_pk)
+        for key, item in request.query_params.items():
+            cache_key += "-%s-%s" % (key, item)
+        
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if data:
+            self.paginator.page = data[0]
+            self.paginator.request = request
+            self.paginator.display_page_controls = True
+            return self.get_paginated_response(data[1]) 
+
         if request.user.is_staff:      
             if livres_pk:
                 emprunts = self.paginate_queryset(self.filter_queryset(self.get_queryset().filter(livre=livres_pk)))
@@ -47,7 +62,22 @@ class EmpruntViewSet(viewsets.ModelViewSet):
                 emprunts = None
 
         serializer = EmpruntSerializer(emprunts, many=True)
+        cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk, membres_pk=None, livres_pk=None):
+        cache_key = 'emprunts-%s-%s-%s' % (pk, membres_pk, livres_pk)
+        cache_time = 86400 # time in seconds for cache to be valid
+        #cache.set(cache_key, None, cache_time)   
+        data = cache.get(cache_key) # returns None if no key-value pair   
+
+        if not data:
+            emprunt = self.queryset.get(pk=pk)
+            serializer = EmpruntSerializer(emprunt)
+            cache.set(cache_key, serializer.data, cache_time)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(data, status=status.HTTP_200_OK)
 
     @extend_schema(
         description='Method that sets a Membre to an Emprunt',

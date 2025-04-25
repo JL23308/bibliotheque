@@ -236,6 +236,7 @@ class AuteurViewSet(viewsets.ModelViewSet):
             self.paginator.display_page_controls = True
             return self.get_paginated_response(data[1]) 
         
+        
         categories = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
         
         serializer = self.get_serializer(categories, many=True)
