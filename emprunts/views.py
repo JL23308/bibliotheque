@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404
-from rest_framework import filters, viewsets, status
+from rest_framework import filters, viewsets, status, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 
@@ -21,7 +21,7 @@ class EmpruntViewSet(viewsets.ModelViewSet):
 
     queryset = Emprunt.objects.all()
     serializer_class = EmpruntSerializer
-    permission_classes = [IsAdminOrMembre]
+    permission_classes = [IsAdminOrMembre, permissions.IsAuthenticatedOrReadOnly]
     pagination_class = EmpruntPagination
     filterset_class = EmpruntFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
