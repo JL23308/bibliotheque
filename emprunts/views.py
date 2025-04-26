@@ -133,6 +133,11 @@ class EmpruntViewSet(viewsets.ModelViewSet):
     def set_livre(self, request, pk=None, livre_pk=None):
         emprunt = self.get_object()
         livre = get_object_or_404(Livre, pk=livre_pk)
+        if not emprunt.retourne:
+            already_booked = livre.emprunt_set.filter(retourne=None)
+            if already_booked:
+                return Response({'status': 'this book is not available'}, status=status.HTTP_400_BAD_REQUEST)
+  
         emprunt.livre = livre
         emprunt.full_clean()
         emprunt.save()
