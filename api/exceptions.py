@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 def custom_exception_handler(exc, context):
 
     handlers = {
-        'ValidationError' : _handle_generic_error,
+        'ValidationError' : _handle_validation_error,
         'Http404' : _handle_generic_error,
         'PermissionDenied' : _handle_permissions_error,
         'NotAuthenticated' : _handle_authentication_error,
@@ -24,6 +24,17 @@ def custom_exception_handler(exc, context):
     exception_class = exc.__class__.__name__
     if exception_class in handlers:
         return handlers[exception_class](exc, context, response)
+
+    return response
+
+def _handle_validation_error(exc, context, response):
+    if response: 
+        response.data = {
+            'status_code' : response.status_code,
+            'error' : str(exc)
+        }
+        
+        response.data['detail'] = ""
 
     return response
 
