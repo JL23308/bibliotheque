@@ -10,6 +10,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
+
 from .permissions import *
 from api.pagination import *
 
@@ -27,7 +29,7 @@ class LivreViewSet(viewsets.ModelViewSet):
 
     queryset = Livre.objects.all()
     serializer_class = LivreSerializer
-    permission_classes = [IsCreateurOrReadOnly, permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsCreateurOrReadOnly, permissions.IsAuthenticated, TokenHasReadWriteScope]
     filterset_class = LivreFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     pagination_class = LivrePagination

@@ -95,8 +95,9 @@ def _handle_permissions_error(exc, context, response):
                 response.data['detail'] = 'You have to be an admin to proceed'    
         
         elif view.__class__.__name__ == 'LivreViewSet':
+            print(context['request'])
             response.data['detail'] = 'You must be the creator of the book to edit or delete it.'
-
+         
     return response
 
 def _handle_not_allowed_error(exc, context, response):
