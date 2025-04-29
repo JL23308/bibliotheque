@@ -53,6 +53,7 @@ class Livre(models.Model):
             double = Livre.objects.filter(titre=self.titre, auteur=self.auteur).exclude(id=exists.id)
         except:
             double = None
+            
         if double:
             errors['titre'] = ValidationError(_("This author already used this title."))
         if errors:
