@@ -27,7 +27,7 @@ class LivreViewSet(viewsets.ModelViewSet):
 
     queryset = Livre.objects.all()
     serializer_class = LivreSerializer
-    permission_classes = [IsCreateurOrReadOnly, permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsCreateurOrReadOnly, permissions.IsAuthenticated]
     filterset_class = LivreFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     pagination_class = LivrePagination
