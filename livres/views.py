@@ -29,7 +29,7 @@ class LivreViewSet(viewsets.ModelViewSet):
 
     queryset = Livre.objects.all()
     serializer_class = LivreSerializer
-    permission_classes = [IsCreateurOrReadOnly, permissions.IsAuthenticated, TokenHasReadWriteScope]
+    permission_classes = [IsCreateurOrReadOnly, permissions.IsAuthenticatedOrReadOnly, TokenHasReadWriteScope]
     filterset_class = LivreFilterSet
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]   
     pagination_class = LivrePagination
@@ -288,8 +288,6 @@ class AuteurViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(categories, many=True)
         cache.set(cache_key, [self.paginator.page, serializer.data], cache_time)
         return self.get_paginated_response(serializer.data)
-
-
 
     def retrieve(self, request, pk, livres_pk=None):
         
