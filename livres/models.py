@@ -48,8 +48,11 @@ class Livre(models.Model):
 
     def clean(self):
         errors = {}
-        exists = Livre.objects.get(pk=self.id)
-        double = Livre.objects.filter(titre=self.titre, auteur=self.auteur).exclude(id=exists.id)
+        try:
+            exists = Livre.objects.get(pk=self.id)
+            double = Livre.objects.filter(titre=self.titre, auteur=self.auteur).exclude(id=exists.id)
+        except:
+            double = None
         if double:
             errors['titre'] = ValidationError(_("This author already used this title."))
         if errors:
